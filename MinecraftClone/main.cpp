@@ -1,13 +1,18 @@
 #include "MinecraftEngine.h"
 
+template <int W, int H>
+struct MinecraftEngineSingleton {
+	void Run() 
+	{
+		MinecraftEngine::GetInstance()->Run(W, H, "Minecraft Engine");
+		delete MinecraftEngine::GetInstance();
+	}
+};
+
 int main()
 {
-	//MinecraftEngine* engine = new MinecraftEngine();
-	//engine->Run(800, 600, "Minecraft Clone");
-	//delete engine;
-
-	MinecraftEngine::GetInstance()->Run(800, 600, "Minecraft Clone");
-	delete MinecraftEngine::GetInstance();
+	MinecraftEngineSingleton<800, 600> engine;
+	engine.Run();
 
 	return 0;
 }

@@ -9,11 +9,7 @@ class MinecraftEngine : public GameEngineBase
 public:
 	~MinecraftEngine();
 
-	static MinecraftEngine* GetInstance() 
-	{
-		static MinecraftEngine* instance = new MinecraftEngine();
-		return instance;
-	}
+	static MinecraftEngine* GetInstance();
 
 private:
 	MinecraftEngine();
@@ -21,6 +17,9 @@ private:
 	void Render(float elapsed);
 	void Update(float elapsed);
 	void OnClick(GLFWwindow* window, int button, int action, int mods);
+	/// <summary>
+	/// Calls OnClick by accuiring engine instance
+	/// </summary>
 	static void m_OnClick(GLFWwindow* window, int button, int action, int mods);
 
 	GameObject* rootObject;

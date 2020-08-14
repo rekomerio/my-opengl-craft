@@ -11,6 +11,12 @@ MinecraftEngine::~MinecraftEngine()
     glDeleteProgram(shaderId);
 }
 
+MinecraftEngine* MinecraftEngine::GetInstance()
+{
+    static MinecraftEngine* instance = new MinecraftEngine();
+    return instance;   
+}
+
 bool MinecraftEngine::OnCreate()
 {
     glfwSetMouseButtonCallback(window, m_OnClick);
@@ -37,7 +43,7 @@ bool MinecraftEngine::OnCreate()
     if (!block->GenerateBuffers())
         return false;
 
-    block->GenerateMesh(0.5f, 0.0f, 0.0f, 0.0f);
+    block->GenerateMesh(0.5f);
 
     block->textureId = GameEngineBase::LoadTexture("textures/container.jpg", GL_RGB);
     rootObject->children.push_back(block);
