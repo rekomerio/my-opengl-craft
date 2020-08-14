@@ -2,13 +2,14 @@
 #include "Mesh.h"
 #include "GameObject.h"
 
-class Cube : public GameObject
+class Block : public GameObject
 {
 public:
-	Cube();
-	~Cube();
+	Block();
+	~Block();
 	void Render(float elapsed) override;
-	bool Init(float size);
+	bool GenerateBuffers();
+	void GenerateMesh(float size);
 
 	std::array<GLuint, 1> VAO;
 	std::array<GLuint, 1> VBO;
