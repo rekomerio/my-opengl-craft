@@ -26,7 +26,6 @@ public:
 	static GLuint CreateShader(GLuint shaderType, std::string source);
 	static GLuint CreateShaderProgram(GLuint vertexShader, GLuint fragmentShader);
 
-private:
 	GLFWwindow* window;
 };
 

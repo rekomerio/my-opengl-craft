@@ -89,7 +89,7 @@ GLuint GameEngineBase::LoadTexture(std::string path, GLuint colorFormat)
 	{
 		std::cout << "Failed to load texture" << std::endl;
 	}
-
+	
 	stbi_image_free(data);
 	return textureId;
 }

@@ -13,6 +13,8 @@ MinecraftEngine::~MinecraftEngine()
 
 bool MinecraftEngine::OnCreate()
 {
+    glfwSetMouseButtonCallback(window, m_OnClick);
+
     GLuint vertexShader = CreateShader(GL_VERTEX_SHADER, "shaders/vertex.glsl");
     GLuint fragmentShader = CreateShader(GL_FRAGMENT_SHADER, "shaders/fragment.glsl");
 
@@ -29,13 +31,16 @@ bool MinecraftEngine::OnCreate()
     glUseProgram(shaderId);
 
     rootObject = new GameObject();
-    Cube* cube = new Cube();
+    Block* block = new Block();
 
-    if (!cube->Init(0.25f))
+
+    if (!block->GenerateBuffers())
         return false;
 
-    cube->textureId = GameEngineBase::LoadTexture("textures/container.jpg", GL_RGB);
-    rootObject->children.push_back(cube);
+    block->GenerateMesh(0.5f, 0.0f, 0.0f, 0.0f);
+
+    block->textureId = GameEngineBase::LoadTexture("textures/container.jpg", GL_RGB);
+    rootObject->children.push_back(block);
 
 	return true;
 }
@@ -50,5 +55,21 @@ void MinecraftEngine::Render(float elapsed)
 
 void MinecraftEngine::Update(float elapsed)
 {
+    static_cast<Block*>(rootObject->children[0])->GenerateMesh(sinf(glfwGetTime()));
+}
 
+
+void MinecraftEngine::OnClick(GLFWwindow* window, int button, int action, int mods)
+{
+    static bool isGlFill = true;
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+        isGlFill = !isGlFill;
+
+    glPolygonMode(GL_FRONT_AND_BACK, (isGlFill ? GL_LINE : GL_FILL));
+}
+
+void MinecraftEngine::m_OnClick(GLFWwindow* window, int button, int action, int mods)
+{
+    GetInstance()->OnClick(window, button, action, mods);
 }

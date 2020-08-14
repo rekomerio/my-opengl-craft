@@ -150,8 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BlockBase.cpp" />
-    <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="Block.cpp" />
     <ClCompile Include="GameEngineBase.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="glad.c" />
@@ -159,8 +158,7 @@
     <ClCompile Include="MinecraftEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BlockBase.h" />
-    <ClInclude Include="Cube.h" />
+    <ClInclude Include="Block.h" />
     <ClInclude Include="GameEngineBase.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Mesh.h" />
