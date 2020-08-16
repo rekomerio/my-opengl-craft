@@ -3,6 +3,7 @@
 Block::Block()
 {
     textureId = 0;
+    mesh = nullptr; // GameEngine will destroy mesh
 }
 
 Block::~Block()

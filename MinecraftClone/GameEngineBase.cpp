@@ -5,7 +5,7 @@
 
 GameEngineBase::GameEngineBase()
 {
-	window = nullptr;
+	m_window = nullptr;
 }
 
 GameEngineBase::~GameEngineBase()
@@ -13,8 +13,6 @@ GameEngineBase::~GameEngineBase()
 	std::vector<Mesh*>::iterator it;
 	for (it = meshes.begin(); it != meshes.end(); it++)
 		delete (*it);
-
-	delete window;
 }
 
 void GameEngineBase::Run(int width, int height, const char* title)
@@ -24,15 +22,15 @@ void GameEngineBase::Run(int width, int height, const char* title)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(width, height, title, NULL, NULL);
-	if (window == NULL)
+	m_window = glfwCreateWindow(width, height, title, NULL, NULL);
+	if (m_window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return;
 	}
 
-	glfwMakeContextCurrent(window);
+	glfwMakeContextCurrent(m_window);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -50,24 +48,24 @@ void GameEngineBase::Run(int width, int height, const char* title)
 	float lastRender = 0.0f;
 	float lastUpdate = 0.0f;
 
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(m_window))
 	{
-		currentTime = glfwGetTime();
+		currentTime = (float)glfwGetTime();
 		Update(currentTime - lastUpdate);
 		lastUpdate = currentTime;
 
-		currentTime = glfwGetTime();
+		currentTime = (float)glfwGetTime();
 		Render(currentTime - lastRender);
 		lastRender = currentTime;
 
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(m_window);
 		glfwPollEvents();
 	}
 }
 
 void GameEngineBase::Close()
 {
-	glfwSetWindowShouldClose(window, true);
+	glfwSetWindowShouldClose(m_window, true);
 }
 
 GLuint GameEngineBase::LoadTexture(std::string path, GLuint colorFormat)

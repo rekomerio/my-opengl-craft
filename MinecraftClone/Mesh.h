@@ -18,10 +18,16 @@ class Mesh
 public:
 	Mesh();
 	~Mesh();
-	void GenerateCube(float size);
 	void Render() const;
+	void GenerateCube(float size);
 	
+	/// <summary>
+	/// Vertex Array Object
+	/// </summary>
 	std::array<GLuint, 1> VAO;
+	/// <summary>
+	/// Vertex Buffer Object
+	/// </summary>
 	std::array<GLuint, 1> VBO;
 
 	std::vector<Vertex> vertices;

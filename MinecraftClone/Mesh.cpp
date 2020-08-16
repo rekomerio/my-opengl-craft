@@ -12,6 +12,12 @@ Mesh::~Mesh()
     glDeleteBuffers(VAO.size(), VBO.data());
 }
 
+void Mesh::Render() const
+{
+    glBindVertexArray(VAO[0]);
+    glDrawArrays(GL_TRIANGLES, 0, (sizeof(Vertex) * vertices.size()));
+}
+
 void Mesh::GenerateCube(float size)
 {
     vertices.clear();
@@ -62,18 +68,12 @@ void Mesh::GenerateCube(float size)
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
     glBufferData(GL_ARRAY_BUFFER, (sizeof(Vertex) * vertices.size()), &vertices[0], GL_STATIC_DRAW);
+    
     // Position
-
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glEnableVertexAttribArray(0);
 
     // Texture
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(2);
-}
-
-void Mesh::Render() const
-{
-    glBindVertexArray(VAO[0]);
-    glDrawArrays(GL_TRIANGLES, 0, (sizeof(Vertex) * vertices.size()));
 }

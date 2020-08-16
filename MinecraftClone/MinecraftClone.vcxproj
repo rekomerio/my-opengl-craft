@@ -164,6 +164,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\OpenGL\src\glad.c" />
     <ClCompile Include="Block.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="GameEngineBase.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
@@ -172,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Block.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="GameEngineBase.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Mesh.h" />
