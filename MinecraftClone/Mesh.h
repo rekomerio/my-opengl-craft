@@ -1,4 +1,6 @@
 #pragma once
+#include <glad/glad.h>
+#include <vector>
 #include <array>
 
 struct Vertex {
@@ -11,9 +13,17 @@ struct Vertex {
 	float tx, ty; // Texture mapping
 };
 
-template <size_t nVertex>
-struct Mesh
+class Mesh
 {	
-	std::array<Vertex, nVertex> vertices;
+public:
+	Mesh();
+	~Mesh();
+	void GenerateCube(float size);
+	void Render() const;
+	
+	std::array<GLuint, 1> VAO;
+	std::array<GLuint, 1> VBO;
+
+	std::vector<Vertex> vertices;
 };
 

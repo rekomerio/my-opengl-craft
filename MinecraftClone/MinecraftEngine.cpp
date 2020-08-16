@@ -3,6 +3,7 @@
 MinecraftEngine::MinecraftEngine()
 {
     rootObject = nullptr;
+    shaderId = 0;
 }
 
 MinecraftEngine::~MinecraftEngine()
@@ -37,15 +38,16 @@ bool MinecraftEngine::OnCreate()
     glUseProgram(shaderId);
 
     rootObject = new GameObject();
+    
+    // Cube mesh
+    Mesh* blockMesh = new Mesh();
+    blockMesh->GenerateCube(0.5f);
+    meshes.push_back(blockMesh);
+    // Block
     Block* block = new Block();
-
-
-    if (!block->GenerateBuffers())
-        return false;
-
-    block->GenerateMesh(0.5f);
-
+    block->mesh = blockMesh;
     block->textureId = GameEngineBase::LoadTexture("textures/container.jpg", GL_RGB);
+    
     rootObject->children.push_back(block);
 
 	return true;
@@ -61,7 +63,7 @@ void MinecraftEngine::Render(float elapsed)
 
 void MinecraftEngine::Update(float elapsed)
 {
-    static_cast<Block*>(rootObject->children[0])->GenerateMesh(sinf(glfwGetTime()));
+    //static_cast<Block*>(rootObject->children[0])->GenerateMesh(sinf(glfwGetTime()));
 }
 
 

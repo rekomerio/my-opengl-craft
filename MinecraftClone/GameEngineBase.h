@@ -8,6 +8,8 @@
 #include <sstream>
 #include <stdio.h>
 #include <iostream>
+#include <vector>
+#include "Mesh.h"
 
 class GameEngineBase
 {
@@ -27,5 +29,6 @@ public:
 	static GLuint CreateShaderProgram(GLuint vertexShader, GLuint fragmentShader);
 
 	GLFWwindow* window;
+	std::vector<Mesh*> meshes;
 };
 

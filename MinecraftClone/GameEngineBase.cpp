@@ -9,6 +9,10 @@ GameEngineBase::GameEngineBase()
 
 GameEngineBase::~GameEngineBase()
 {
+	std::vector<Mesh*>::iterator it;
+	for (it = meshes.begin(); it != meshes.end(); it++)
+		delete (*it);
+
 	delete window;
 }
 
