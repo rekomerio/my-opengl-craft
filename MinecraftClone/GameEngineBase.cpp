@@ -5,7 +5,7 @@
 
 GameEngineBase::GameEngineBase()
 {
-	m_window = nullptr;
+	m_Window = nullptr;
 }
 
 GameEngineBase::~GameEngineBase()
@@ -22,15 +22,15 @@ void GameEngineBase::Run(int width, int height, const char* title)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	m_window = glfwCreateWindow(width, height, title, NULL, NULL);
-	if (m_window == NULL)
+	m_Window = glfwCreateWindow(width, height, title, NULL, NULL);
+	if (m_Window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return;
 	}
 
-	glfwMakeContextCurrent(m_window);
+	glfwMakeContextCurrent(m_Window);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -48,7 +48,7 @@ void GameEngineBase::Run(int width, int height, const char* title)
 	float lastRender = 0.0f;
 	float lastUpdate = 0.0f;
 
-	while (!glfwWindowShouldClose(m_window))
+	while (!glfwWindowShouldClose(m_Window))
 	{
 		currentTime = (float)glfwGetTime();
 		Update(currentTime - lastUpdate);
@@ -58,14 +58,14 @@ void GameEngineBase::Run(int width, int height, const char* title)
 		Render(currentTime - lastRender);
 		lastRender = currentTime;
 
-		glfwSwapBuffers(m_window);
+		glfwSwapBuffers(m_Window);
 		glfwPollEvents();
 	}
 }
 
 void GameEngineBase::Close()
 {
-	glfwSetWindowShouldClose(m_window, true);
+	glfwSetWindowShouldClose(m_Window, true);
 }
 
 GLuint GameEngineBase::LoadTexture(std::string path, GLuint colorFormat)

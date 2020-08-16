@@ -2,77 +2,91 @@
 
 Camera::Camera()
 {
-	cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-	cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-	m_yaw = -90.0f;
-	m_pitch = 0.0f;
-	fov = 90.0f;
+	cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+
+	m_Yaw = -90.0f;
+	m_Pitch = 0.0f;
+	m_Fov = 90.0f;
+
+	m_AspectRatio = 800.0f / 600.0f;
+
+	m_MinDistance = 0.1f;
+	m_MaxDistance = 100.0f;
+
+	UpdateCameraFront();
+	UpdateProjection();
 }
 
 void Camera::ApplyToProgram(GLuint shaderId)
 {
-	constexpr float width = 800.0f;
-	constexpr float height = 600.0f;
-	constexpr float ratio = width / height;
-	constexpr float minDistance = 1.0f;
-	constexpr float maxDistance = 100.0f;
+	GLuint viewLocation = glGetUniformLocation(shaderId, "view");
+	GLuint projectionLocation = glGetUniformLocation(shaderId, "projection");
 
-	glm::mat4 view = glm::lookAt(
-		glm::vec3(0.0f, 0.0f, 3.0f),
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f)
-	);
-
-	glm::mat4 projection = glm::mat4(1.0f);
-	projection = glm::perspective(glm::radians(fov), ratio, minDistance, maxDistance);
-
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
-	GLuint viewLoc = glGetUniformLocation(shaderId, "view");
-	GLuint projectionLoc = glGetUniformLocation(shaderId, "projection");
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
 }
 
 void Camera::SetYaw(float deg)
 {
-	m_yaw = glm::mod(deg, 360.0f);
-
-	glm::vec3 direction;
-	direction.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-	direction.y = sin(glm::radians(m_pitch));
-	direction.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-	cameraFront = glm::normalize(direction);
+	m_Yaw = glm::mod(deg, 360.0f);
+	UpdateCameraFront();
 }
 
 void Camera::SetPitch(float deg)
 {
-	m_pitch = fmin(fmax(-89.0f, deg), 89.0f);
-
-	glm::vec3 direction;
-	direction.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-	direction.y = sin(glm::radians(m_pitch));
-	direction.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-	cameraFront = glm::normalize(direction);
+	m_Pitch = fmin(fmax(-89.9f, deg), 89.9f);
+	UpdateCameraFront();
 }
 
 void Camera::AddYaw(float deg)
 {
-	SetYaw(m_yaw + deg);
+	SetYaw(m_Yaw + deg);
 }
 
 void Camera::AddPitch(float deg)
 {
-	SetPitch(m_pitch + deg);
+	SetPitch(m_Pitch + deg);
 }
 
-inline float Camera::GetYaw()
+void Camera::SetAspectRatio(float ratio)
 {
-	return m_yaw;
+	m_AspectRatio = ratio;
+	UpdateProjection();
 }
 
-inline float Camera::GetPitch()
+void Camera::SetFov(float fov)
 {
-	return m_pitch;
+	m_Fov = fov;
+	UpdateProjection();
+}
+
+void Camera::SetPosition(float x, float y, float z)
+{
+	cameraPosition = glm::vec3(x, y, z);
+	view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+}
+
+void Camera::MoveRelativeToDirection(float forward, float up, float left)
+{
+	cameraPosition += cameraFront * forward;
+	cameraPosition += cameraUp * up;
+	cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * left;
+
+	view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+}
+
+void Camera::UpdateCameraFront()
+{
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+	direction.y = sin(glm::radians(m_Pitch));
+	direction.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+	cameraFront = glm::normalize(direction);
+	view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+}
+
+void Camera::UpdateProjection()
+{
+	projection = glm::perspective(glm::radians(m_Fov), m_AspectRatio, m_MinDistance, m_MaxDistance);
 }

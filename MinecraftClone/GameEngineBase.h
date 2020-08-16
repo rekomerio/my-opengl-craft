@@ -29,7 +29,7 @@ public:
 	static GLuint CreateShaderProgram(GLuint vertexShader, GLuint fragmentShader);
 
 protected:
-	GLFWwindow* m_window;
+	GLFWwindow* m_Window;
 	std::vector<Mesh*> meshes;
 };
 

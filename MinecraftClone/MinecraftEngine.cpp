@@ -20,9 +20,9 @@ MinecraftEngine* MinecraftEngine::GetInstance()
 
 bool MinecraftEngine::OnCreate()
 {
-    glfwSetMouseButtonCallback(m_window, m_OnClick);
-    glfwSetCursorPosCallback(m_window, m_OnMouseMove);
-    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetMouseButtonCallback(m_Window, m_OnClick);
+    glfwSetCursorPosCallback(m_Window, m_OnMouseMove);
+    glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     GLuint vertexShader = CreateShader(GL_VERTEX_SHADER, "shaders/vertex.glsl");
     GLuint fragmentShader = CreateShader(GL_FRAGMENT_SHADER, "shaders/fragment.glsl");
@@ -57,16 +57,34 @@ bool MinecraftEngine::OnCreate()
 
 void MinecraftEngine::Render(float elapsed)
 {
-
 	glClearColor(0.3f, 0.3f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     camera.ApplyToProgram(shaderId);
     rootObject->Render(elapsed);
+
+    char buffer[64];
+    // sprintf_s(buffer, "%d", (int)(1.0f / elapsed));
+    sprintf_s(buffer, "X: %f Z: %f", camera.GetPosition().x, camera.GetPosition().z);
+    glfwSetWindowTitle(m_Window, buffer);
 }
 
 void MinecraftEngine::Update(float elapsed)
 {
+    float cameraSpeed = elapsed * 5.0f;
+
+    if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.MoveRelativeToDirection(cameraSpeed, 0.0f, 0.0f);
+    if (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.MoveRelativeToDirection(-cameraSpeed, 0.0f, 0.0f);
+    if (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.MoveRelativeToDirection(0.0f, 0.0f, cameraSpeed);
+    if (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.MoveRelativeToDirection(0.0f, 0.0f, -cameraSpeed);
+    if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.MoveRelativeToDirection(0.0f, cameraSpeed, 0.0f);
+    if (glfwGetKey(m_Window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        camera.MoveRelativeToDirection(0.0f, -cameraSpeed, 0.0f);
 }
 
 void MinecraftEngine::OnClick(GLFWwindow* window, int button, int action, int mods)
@@ -76,7 +94,7 @@ void MinecraftEngine::OnClick(GLFWwindow* window, int button, int action, int mo
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
         isGlFill = !isGlFill;
 
-    glPolygonMode(GL_FRONT_AND_BACK, (isGlFill ? GL_LINE : GL_FILL));
+    glPolygonMode(GL_FRONT_AND_BACK, (!isGlFill ? GL_LINE : GL_FILL));
 }
 
 /// <summary>
@@ -97,7 +115,7 @@ void MinecraftEngine::OnMouseMove(GLFWwindow* window, double x, double y)
         mouse.y = y;
     }
 
-    constexpr float sensitivity = 0.1f;
+    constexpr float sensitivity = 0.2f;
     glm::dvec2 offset;
     offset.x = x - mouse.x;
     offset.y = mouse.y - y;
