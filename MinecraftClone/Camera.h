@@ -20,7 +20,8 @@ public:
 	void MoveRelativeToDirection(float forward, float up, float left);
 	inline float GetYaw() const { return m_Yaw; }
 	inline float GetPitch() const { return m_Pitch; }
-	inline glm::vec3 GetPosition() const { return cameraPosition; }
+	inline float GetFov() const { return m_Fov; }
+	inline glm::vec3 GetPosition() const { return m_Position; }
 
 private:
 	void UpdateCameraFront();
@@ -31,9 +32,9 @@ private:
 	float m_AspectRatio;
 	float m_MinDistance, m_MaxDistance;
 
-	glm::vec3 cameraPosition;
-	glm::vec3 cameraFront;
-	glm::vec3 cameraUp;
+	glm::vec3 m_Position;
+	glm::vec3 m_Front;
+	glm::vec3 m_Up;
 
 	glm::mat4 projection;
 	glm::mat4 view;

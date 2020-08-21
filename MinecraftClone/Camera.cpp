@@ -2,10 +2,10 @@
 
 Camera::Camera()
 {
-	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-	cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+	m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
+	m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	m_Yaw = -90.0f;
+	m_Yaw = 0.0f;
 	m_Pitch = 0.0f;
 	m_Fov = 90.0f;
 
@@ -63,17 +63,17 @@ void Camera::SetFov(float fov)
 
 void Camera::SetPosition(float x, float y, float z)
 {
-	cameraPosition = glm::vec3(x, y, z);
-	view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+	m_Position = glm::vec3(x, y, z);
+	view = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 }
 
 void Camera::MoveRelativeToDirection(float forward, float up, float left)
 {
-	cameraPosition += cameraFront * forward;
-	cameraPosition += cameraUp * up;
-	cameraPosition += glm::normalize(glm::cross(cameraFront, cameraUp)) * left;
+	m_Position += m_Front * forward;
+	m_Position += m_Up * up;
+	m_Position += glm::normalize(glm::cross(m_Front, m_Up)) * left;
 
-	view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+	view = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 }
 
 void Camera::UpdateCameraFront()
@@ -82,8 +82,8 @@ void Camera::UpdateCameraFront()
 	direction.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 	direction.y = sin(glm::radians(m_Pitch));
 	direction.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
-	cameraFront = glm::normalize(direction);
-	view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+	m_Front = glm::normalize(direction);
+	view = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 }
 
 void Camera::UpdateProjection()
