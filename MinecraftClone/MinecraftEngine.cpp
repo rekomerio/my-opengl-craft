@@ -3,13 +3,13 @@
 MinecraftEngine::MinecraftEngine()
 {
     rootObject = nullptr;
-    shaderId = 0;
+    activeShader = 0;
 }
 
 MinecraftEngine::~MinecraftEngine()
 {
     delete rootObject;
-    glDeleteProgram(shaderId);
+    glDeleteProgram(activeShader);
 }
 
 MinecraftEngine* MinecraftEngine::GetInstance()
@@ -18,10 +18,16 @@ MinecraftEngine* MinecraftEngine::GetInstance()
     return instance;   
 }
 
+GLuint& MinecraftEngine::GetActiveShader()
+{
+    return activeShader;
+}
+
 bool MinecraftEngine::OnCreate()
 {
     glfwSetMouseButtonCallback(m_Window, m_OnClick);
     glfwSetCursorPosCallback(m_Window, m_OnMouseMove);
+    glfwSetFramebufferSizeCallback(m_Window, m_OnResize);
     glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     GLuint vertexShader = CreateShader(GL_VERTEX_SHADER, "shaders/vertex.glsl");
@@ -32,12 +38,12 @@ bool MinecraftEngine::OnCreate()
     if (!fragmentShader)
         return false;
 
-    shaderId = CreateShaderProgram(vertexShader, fragmentShader);
+    activeShader = CreateShaderProgram(vertexShader, fragmentShader);
 
-    if (!shaderId)
+    if (!activeShader)
         return false;
 
-    glUseProgram(shaderId);
+    glUseProgram(activeShader);
 
     rootObject = new GameObject();
     
@@ -51,7 +57,11 @@ bool MinecraftEngine::OnCreate()
     block->textureId = LoadTexture("textures/container.jpg", GL_RGB);
     
     rootObject->children.push_back(block);
+
     glEnable(GL_DEPTH_TEST);
+
+    camera.SetPosition(-3.0f, 0.0f, 0.0f);
+
 	return true;
 }
 
@@ -60,12 +70,13 @@ void MinecraftEngine::Render(float elapsed)
 	glClearColor(0.3f, 0.3f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    camera.ApplyToProgram(shaderId);
+    camera.ApplyToProgram(activeShader);
     rootObject->Render(elapsed);
 
-    char buffer[64];
+    char buffer[128];
     // sprintf_s(buffer, "%d", (int)(1.0f / elapsed));
-    sprintf_s(buffer, "X: %f Z: %f", camera.GetPosition().x, camera.GetPosition().z);
+    glm::vec3 pos = camera.GetPosition();
+    sprintf_s(buffer, "X: %f Y:%f Z: %f", pos.x, pos.y, pos.z);
     glfwSetWindowTitle(m_Window, buffer);
 }
 
@@ -85,14 +96,22 @@ void MinecraftEngine::Update(float elapsed)
         camera.MoveRelativeToDirection(0.0f, cameraSpeed, 0.0f);
     if (glfwGetKey(m_Window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
         camera.MoveRelativeToDirection(0.0f, -cameraSpeed, 0.0f);
+
+    if (glfwGetKey(m_Window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        rootObject->children[0]->Rotate(10.0f, glm::vec3(1.0f, 1.0f, 0.0f));
+
+    rootObject->Update(elapsed);
 }
 
 void MinecraftEngine::OnClick(GLFWwindow* window, int button, int action, int mods)
 {
     static bool isGlFill = true;
 
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
         isGlFill = !isGlFill;
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+        rootObject->children[0]->SetPosition(glm::vec3(rand() % 2, rand() % 2, rand() % 2));
 
     glPolygonMode(GL_FRONT_AND_BACK, (!isGlFill ? GL_LINE : GL_FILL));
 }
@@ -131,4 +150,16 @@ void MinecraftEngine::OnMouseMove(GLFWwindow* window, double x, double y)
 void MinecraftEngine::m_OnMouseMove(GLFWwindow* window, double x, double y)
 {
     GetInstance()->OnMouseMove(window, x, y);
+}
+
+
+void MinecraftEngine::OnResize(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+    camera.SetAspectRatio(static_cast<float>(width / height));
+}
+
+void MinecraftEngine::m_OnResize(GLFWwindow* window, int width, int height)
+{
+    GetInstance()->OnResize(window, width, height);
 }

@@ -20,7 +20,7 @@ public:
 	virtual bool OnCreate() = 0;
 	virtual void Render(float elapsed) = 0;
 	virtual void Update(float elapsed) = 0;
-
+	
 	void Run(int width, int height, const char* title);
 	void Close();
 

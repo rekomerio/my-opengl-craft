@@ -1,9 +1,9 @@
 #pragma once
 #include "GameEngineBase.h"
 #include "Block.h"
+#include "Camera.h"
 #include <iostream>
 #include <array>
-#include "Camera.h"
 
 class MinecraftEngine : public GameEngineBase
 {
@@ -11,6 +11,7 @@ public:
 	~MinecraftEngine();
 
 	static MinecraftEngine* GetInstance();
+	GLuint& GetActiveShader();
 
 private:
 	MinecraftEngine();
@@ -19,12 +20,14 @@ private:
 	void Update(float elapsed);
 	
 	void OnClick(GLFWwindow* window, int button, int action, int mods);
-	static void m_OnClick(GLFWwindow* window, int button, int action, int mods);
 	void OnMouseMove(GLFWwindow* window, double x, double y);
+	void OnResize(GLFWwindow* window, int width, int height);
+	static void m_OnClick(GLFWwindow* window, int button, int action, int mods);
 	static void m_OnMouseMove(GLFWwindow* window, double x, double y);
+	static void m_OnResize(GLFWwindow* window, int width, int height);
 
 	GameObject* rootObject;
-	GLuint shaderId;
+	GLuint activeShader;
 	Camera camera;
 };
 
