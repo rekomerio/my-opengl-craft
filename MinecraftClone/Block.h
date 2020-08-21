@@ -1,7 +1,7 @@
 #pragma once
-#include "Mesh.h"
 #include "GameObject.h"
-#include <array>
+#include "Mesh.h"
+#include "MinecraftEngine.h"
 
 class Block : public GameObject
 {
@@ -9,6 +9,7 @@ public:
 	Block();
 	~Block();
 	void Render(float elapsed) override;
+	void Update(float elapsed) override;
 
 	GLuint textureId;
 	Mesh* mesh;
