@@ -2,10 +2,9 @@
 
 GameObject::GameObject()
 {
-	velocity = glm::vec3(0.0f, 0.0f, 0.0f);
 	m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
-	model = glm::mat4(1.0f);
-	gravity = 0.0f;
+	m_Rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_Model = glm::mat4(1.0f);
 }
 
 GameObject::~GameObject()
@@ -38,11 +37,13 @@ void GameObject::Update(float elapsed)
 
 void GameObject::Rotate(float degrees, glm::vec3 axis)
 {
-	model = glm::rotate(model, glm::radians(degrees), axis);
+	m_Model = glm::rotate(m_Model, glm::radians(degrees), axis);
+	// m_Rotation += axis * degrees;
+	m_Rotation = glm::mod(m_Rotation + axis * degrees, 360.0f);
 }
 
 void GameObject::SetPosition(glm::vec3 position)
 {
-	model = glm::translate(model, position - m_Position);
+	m_Model = glm::translate(m_Model, position - m_Position);
 	m_Position = position;
 }

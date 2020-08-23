@@ -10,18 +10,19 @@ class GameObject
 public:
 	GameObject();
 	virtual ~GameObject();
+
 	virtual void Render(float elapsed);
 	virtual void Update(float elapsed);
-	void Rotate(float degrees, glm::vec3 axis);
-	void SetPosition(glm::vec3 position);
+	virtual void Rotate(float degrees, glm::vec3 axis);
+	virtual void SetPosition(glm::vec3 position);
+	glm::vec3 GetPosition() const { return m_Position; }
+	glm::vec3 GetRotation() const { return m_Rotation; }
 
 	std::vector<GameObject*> children;
 
-	glm::vec3 velocity;
-	float gravity;
-
 protected:
-	glm::mat4 model;
+	glm::mat4 m_Model;
 	glm::vec3 m_Position;
+	glm::vec3 m_Rotation;
 };
 
