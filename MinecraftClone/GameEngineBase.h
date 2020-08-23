@@ -31,5 +31,6 @@ public:
 protected:
 	GLFWwindow* m_Window;
 	std::vector<Mesh*> meshes;
+	std::vector<GLuint> textures;
 };
 

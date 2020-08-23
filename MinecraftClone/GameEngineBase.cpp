@@ -10,9 +10,16 @@ GameEngineBase::GameEngineBase()
 
 GameEngineBase::~GameEngineBase()
 {
-	std::vector<Mesh*>::iterator it;
-	for (it = meshes.begin(); it != meshes.end(); it++)
-		delete (*it);
+	{
+		std::vector<Mesh*>::iterator it;
+		for (it = meshes.begin(); it != meshes.end(); it++)
+			delete (*it);
+	}
+	{
+		std::vector<GLuint>::iterator it;
+		for (it = textures.begin(); it != textures.end(); it++)
+			glDeleteTextures(1, &(*it));
+	}
 }
 
 void GameEngineBase::Run(int width, int height, const char* title)
