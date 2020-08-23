@@ -49,18 +49,26 @@ bool MinecraftEngine::OnCreate()
     
     // Cube mesh
     Mesh* blockMesh = new Mesh();
-    blockMesh->GenerateCube(0.5f);
+    blockMesh->GenerateCube(1.0f);
     meshes.push_back(blockMesh);
     // Block
-    Block* block = new Block();
-    block->mesh = blockMesh;
-    block->textureId = LoadTexture("textures/container.jpg", GL_RGB);
-    
-    rootObject->children.push_back(block);
-
+    GLuint texture = LoadTexture("textures/container.jpg", GL_RGB);
+    textures.push_back(texture);
+    {
+        Block* block = new Block();
+        block->mesh = blockMesh;
+        block->textureId = texture;
+        rootObject->children.push_back(block);
+    }
+    {
+        Block* block = new Block();
+        block->mesh = blockMesh;
+        block->textureId = texture;
+        rootObject->children.push_back(block);
+    }
     glEnable(GL_DEPTH_TEST);
 
-    camera.SetPosition(-3.0f, 0.0f, 0.0f);
+    player.SetPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
 
 	return true;
 }
@@ -70,12 +78,12 @@ void MinecraftEngine::Render(float elapsed)
 	glClearColor(0.3f, 0.3f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    camera.ApplyToProgram(activeShader);
+    player.Render(elapsed, activeShader);
     rootObject->Render(elapsed);
 
     char buffer[128];
     // sprintf_s(buffer, "%d", (int)(1.0f / elapsed));
-    glm::vec3 pos = camera.GetPosition();
+    glm::vec3 pos = player.GetPosition();
     sprintf_s(buffer, "X: %f Y:%f Z: %f", pos.x, pos.y, pos.z);
     glfwSetWindowTitle(m_Window, buffer);
 }
@@ -85,22 +93,23 @@ void MinecraftEngine::Update(float elapsed)
     float cameraSpeed = elapsed * 5.0f;
 
     if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.MoveRelativeToDirection(cameraSpeed, 0.0f, 0.0f);
+        player.MoveRelativeToDirection(cameraSpeed, 0.0f, 0.0f);
     if (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.MoveRelativeToDirection(-cameraSpeed, 0.0f, 0.0f);
+        player.MoveRelativeToDirection(-cameraSpeed, 0.0f, 0.0f);
     if (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.MoveRelativeToDirection(0.0f, 0.0f, cameraSpeed);
+        player.MoveRelativeToDirection(0.0f, 0.0f, cameraSpeed);
     if (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.MoveRelativeToDirection(0.0f, 0.0f, -cameraSpeed);
+        player.MoveRelativeToDirection(0.0f, 0.0f, -cameraSpeed);
     if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.MoveRelativeToDirection(0.0f, cameraSpeed, 0.0f);
+        player.MoveRelativeToDirection(0.0f, cameraSpeed, 0.0f);
     if (glfwGetKey(m_Window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        camera.MoveRelativeToDirection(0.0f, -cameraSpeed, 0.0f);
+        player.MoveRelativeToDirection(0.0f, -cameraSpeed, 0.0f);
 
-    if (glfwGetKey(m_Window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        rootObject->children[0]->Rotate(10.0f, glm::vec3(1.0f, 1.0f, 0.0f));
+    std::cout << player.GetRotation().x << std::endl;
 
     rootObject->Update(elapsed);
+
+
 }
 
 void MinecraftEngine::OnClick(GLFWwindow* window, int button, int action, int mods)
@@ -126,7 +135,7 @@ inline void MinecraftEngine::m_OnClick(GLFWwindow* window, int button, int actio
 
 void MinecraftEngine::OnMouseMove(GLFWwindow* window, double x, double y)
 {
-    static glm::dvec2 mouse(-1.0, -1.0);
+    static glm::vec2 mouse(-1.0, -1.0);
 
     if (mouse.x < 0.0 && mouse.y < 0.0)
     {
@@ -135,7 +144,7 @@ void MinecraftEngine::OnMouseMove(GLFWwindow* window, double x, double y)
     }
 
     constexpr float sensitivity = 0.2f;
-    glm::dvec2 offset;
+    glm::vec2 offset;
     offset.x = x - mouse.x;
     offset.y = mouse.y - y;
     offset *= sensitivity;
@@ -143,8 +152,8 @@ void MinecraftEngine::OnMouseMove(GLFWwindow* window, double x, double y)
     mouse.x = x;
     mouse.y = y;
 
-    camera.AddYaw(offset.x);
-    camera.AddPitch(offset.y);
+    player.camera.AddPitch(offset.y);
+    player.Rotate(offset.x, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void MinecraftEngine::m_OnMouseMove(GLFWwindow* window, double x, double y)
@@ -156,7 +165,7 @@ void MinecraftEngine::m_OnMouseMove(GLFWwindow* window, double x, double y)
 void MinecraftEngine::OnResize(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-    camera.SetAspectRatio(static_cast<float>(width / height));
+    player.camera.SetAspectRatio(static_cast<float>(width / height));
 }
 
 void MinecraftEngine::m_OnResize(GLFWwindow* window, int width, int height)

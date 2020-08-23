@@ -16,7 +16,7 @@ public:
 	void AddPitch(float deg);
 	void SetAspectRatio(float ratio);
 	void SetFov(float fov);
-	void SetPosition(float x, float y, float z);
+	void SetPosition(glm::vec3 position);
 	void MoveRelativeToDirection(float forward, float up, float left);
 	inline float GetYaw() const { return m_Yaw; }
 	inline float GetPitch() const { return m_Pitch; }

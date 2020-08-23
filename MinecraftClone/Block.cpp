@@ -8,7 +8,6 @@ Block::Block()
 
 Block::~Block()
 {
-    glDeleteTextures(1, &textureId);
 }
 
 void Block::Render(float elapsed)
@@ -18,7 +17,7 @@ void Block::Render(float elapsed)
 
     // Send model to shader, should try to do this in GameObjects render instead
     GLuint modelLocation = glGetUniformLocation(MinecraftEngine::GetInstance()->GetActiveShader(), "model");
-    glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(m_Model));
 
     mesh->Render();
     // Render children of this Block
@@ -27,5 +26,7 @@ void Block::Render(float elapsed)
 
 void Block::Update(float elapsed)
 {
+    Rotate(elapsed * 10, glm::vec3(1.0f, 0.0f, 0.0f));
+    //std::cout << GetRotation().x << std::endl;
     GameObject::Update(elapsed);
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "GameEngineBase.h"
 #include "Block.h"
-#include "Camera.h"
+#include "Player.h"
 #include <iostream>
 #include <array>
 
@@ -28,6 +28,6 @@ private:
 
 	GameObject* rootObject;
 	GLuint activeShader;
-	Camera camera;
+	Player player;
 };
 

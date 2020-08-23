@@ -61,9 +61,9 @@ void Camera::SetFov(float fov)
 	UpdateProjection();
 }
 
-void Camera::SetPosition(float x, float y, float z)
+void Camera::SetPosition(glm::vec3 position)
 {
-	m_Position = glm::vec3(x, y, z);
+	m_Position = position;
 	view = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 }
 
