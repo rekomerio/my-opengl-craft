@@ -8,9 +8,10 @@ class Block : public GameObject
 {
 public:
 	Block();
+	Block(glm::vec3 position);
 	~Block();
 
-	void Render(float elapsed) override;
+	void Render(float elapsed, GLuint activeShader) override;
 	void Update(float elapsed) override;
 
 	GLuint textureId;

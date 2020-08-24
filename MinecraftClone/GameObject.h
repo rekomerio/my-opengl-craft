@@ -4,6 +4,7 @@
 #include <array>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm\gtc\type_ptr.hpp>
 
 class GameObject
 {
@@ -11,7 +12,7 @@ public:
 	GameObject();
 	virtual ~GameObject();
 
-	virtual void Render(float elapsed);
+	virtual void Render(float elapsed, GLuint activeShader);
 	virtual void Update(float elapsed);
 	virtual void Rotate(float degrees, glm::vec3 axis);
 	virtual void SetPosition(glm::vec3 position);
