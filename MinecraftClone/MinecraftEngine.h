@@ -27,7 +27,7 @@ private:
 	static void m_OnResize(GLFWwindow* window, int width, int height);
 
 	GameObject* rootObject;
+	Player* player;
 	GLuint activeShader;
-	Player player;
 };
 
