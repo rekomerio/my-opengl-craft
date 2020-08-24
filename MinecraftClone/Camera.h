@@ -36,7 +36,7 @@ private:
 	glm::vec3 m_Front;
 	glm::vec3 m_Up;
 
-	glm::mat4 projection;
-	glm::mat4 view;
+	glm::mat4 m_Projection;
+	glm::mat4 m_View;
 };
 
