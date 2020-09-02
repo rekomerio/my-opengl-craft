@@ -2,9 +2,10 @@
 
 GameObject::GameObject()
 {
-	m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
-	m_Rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_Position = glm::vec3(0.0f);
+	m_Rotation = glm::vec3(0.0f);
 	m_Model = glm::mat4(1.0f);
+	isStatic = true;
 }
 
 GameObject::~GameObject()

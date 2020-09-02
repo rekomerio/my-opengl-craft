@@ -177,19 +177,26 @@
     <ClCompile Include="..\..\..\..\OpenGL\src\glad.c" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CollisionBox.cpp" />
+    <ClCompile Include="CollisionHandler.cpp" />
     <ClCompile Include="GameEngineBase.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MinecraftEngine.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Block.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CollisionBox.h" />
+    <ClInclude Include="CollisionHandler.h" />
     <ClInclude Include="GameEngineBase.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MinecraftEngine.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

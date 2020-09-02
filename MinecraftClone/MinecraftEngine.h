@@ -2,6 +2,8 @@
 #include "GameEngineBase.h"
 #include "Block.h"
 #include "Player.h"
+#include "CollisionHandler.h"
+#include "CollisionBox.h"
 #include <iostream>
 #include <array>
 
@@ -29,5 +31,6 @@ private:
 	GameObject* rootObject;
 	Player* player;
 	GLuint activeShader;
+	CollisionHandler collisionHandler;
 };
 

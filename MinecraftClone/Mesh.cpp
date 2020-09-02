@@ -20,6 +20,8 @@ void Mesh::Render() const
 
 void Mesh::GenerateCube(float size)
 {
+    size *= 0.5f;
+    
     vertices.clear();
 
     vertices.push_back(Vertex(-size, -size, -size, 0.0f, 0.0f));

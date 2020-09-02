@@ -57,16 +57,19 @@ bool MinecraftEngine::OnCreate()
     textures.push_back(texture);
 
     player = new Player();
+    player->isStatic = false;
+    collisionHandler.AddCollisionBox(glm::vec3(0.5f), player);
     // Player must be first in list so it gets rendered first and camera applied to shader
     rootObject->children.push_back(player);
 
     for (size_t x = 0; x < 10; x++)
-        for (size_t z = 0; z < 10; z++)
+        for (size_t z = 0; z < 100; z++)
         {
             Block* block = new Block(glm::vec3(x, 0.0f, z));
             block->mesh = blockMesh;
             block->textureId = texture;
             rootObject->children.push_back(block);
+            collisionHandler.AddCollisionBox(glm::vec3(0.5f), block);
         }
 
     player->mesh = blockMesh;
@@ -111,9 +114,8 @@ void MinecraftEngine::Update(float elapsed)
     if (glfwGetKey(m_Window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
         player->MoveRelativeToDirection(0.0f, -cameraSpeed, 0.0f);
 
-    //std::cout << player->GetRotation().x << std::endl;
-
     rootObject->Update(elapsed);
+    collisionHandler.Handle();
 }
 
 void MinecraftEngine::OnClick(GLFWwindow* window, int button, int action, int mods)

@@ -20,6 +20,10 @@ public:
 	glm::vec3 GetRotation() const { return m_Rotation; }
 
 	std::vector<GameObject*> children;
+	/// <summary>
+	/// Do physics affect this object
+	/// </summary>
+	bool isStatic;
 
 protected:
 	glm::mat4 m_Model;
