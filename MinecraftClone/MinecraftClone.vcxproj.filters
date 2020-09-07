@@ -48,6 +48,12 @@
     <ClCompile Include="CollisionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Particle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameEngineBase.h">
@@ -78,6 +84,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CollisionHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

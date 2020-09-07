@@ -1,6 +1,6 @@
 #include "MinecraftEngine.h"
 
-MinecraftEngine::MinecraftEngine()
+MinecraftEngine::MinecraftEngine() : particleHandler(1000)
 {
     rootObject = nullptr;
     player = nullptr;
@@ -33,6 +33,7 @@ bool MinecraftEngine::OnCreate()
 
     GLuint vertexShader = CreateShader(GL_VERTEX_SHADER, "shaders/vertex.glsl");
     GLuint fragmentShader = CreateShader(GL_FRAGMENT_SHADER, "shaders/fragment.glsl");
+    GLuint asd = CreateShader(GL_FRAGMENT_SHADER, "shaders/particleFragment.glsl");
 
     if (!vertexShader)
         return false;
@@ -44,14 +45,18 @@ bool MinecraftEngine::OnCreate()
     if (!activeShader)
         return false;
 
-    glUseProgram(activeShader);
-
     rootObject = new GameObject();
     
     // Cube mesh
     Mesh* blockMesh = new Mesh();
     blockMesh->GenerateCube(1.0f);
     meshes.push_back(blockMesh);
+
+    // Particle mesh
+    Mesh* particleMesh = new Mesh();
+    particleMesh->GenerateCube(0.2f);
+    meshes.push_back(particleMesh);
+
     // Block
     GLuint texture = LoadTexture("textures/container.jpg", GL_RGB);
     textures.push_back(texture);
@@ -62,8 +67,8 @@ bool MinecraftEngine::OnCreate()
     // Player must be first in list so it gets rendered first and camera applied to shader
     rootObject->children.push_back(player);
 
-    for (size_t x = 0; x < 10; x++)
-        for (size_t z = 0; z < 100; z++)
+    for (size_t x = 0; x < 5; x++)
+        for (size_t z = 0; z < 5; z++)
         {
             Block* block = new Block(glm::vec3(x, 0.0f, z));
             block->mesh = blockMesh;
@@ -76,19 +81,22 @@ bool MinecraftEngine::OnCreate()
     player->textureId = texture;
     player->SetPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
 
+    glUseProgram(activeShader);
     glEnable(GL_DEPTH_TEST);
-
 
 	return true;
 }
 
 void MinecraftEngine::Render(float elapsed)
 {
-	glClearColor(0.3f, 0.3f, 0.0f, 1.0f);
+	glClearColor(0.0f, 0.5f, 0.8f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    //player->Render(elapsed, activeShader);
+
+    glUniform1i(glGetUniformLocation(activeShader, "useTexture"), 1);
     rootObject->Render(elapsed, activeShader);
+
+    glUniform1i(glGetUniformLocation(activeShader, "useTexture"), 0);
+    particleHandler.Render(elapsed, activeShader);
 
     char buffer[128];
     // sprintf_s(buffer, "%d", (int)(1.0f / elapsed));
@@ -100,6 +108,8 @@ void MinecraftEngine::Render(float elapsed)
 void MinecraftEngine::Update(float elapsed)
 {
     float cameraSpeed = elapsed * 5.0f;
+
+    auto randf = [](float min, float max) { return ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * (max - min)) + min; };
 
     if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
         player->MoveRelativeToDirection(cameraSpeed, 0.0f, 0.0f);
@@ -113,9 +123,19 @@ void MinecraftEngine::Update(float elapsed)
         player->MoveRelativeToDirection(0.0f, cameraSpeed, 0.0f);
     if (glfwGetKey(m_Window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
         player->MoveRelativeToDirection(0.0f, -cameraSpeed, 0.0f);
+    
+    {
+        Particle particle;
+        particle.mesh = meshes[1];
+        particle.velocity = glm::vec3(randf(-1.0f, 1.0f), randf(1.0f, 3.0f), randf(-1.0f, 1.0f));
+        particle.lifeSpan = 2.0f;
+        particle.color = glm::vec4(randf(0.75f, 1.0f), randf(0.75f, 1.0f), randf(0.0f, 0.1f), 1.0f);
+        particleHandler.Emit(particle);
+    }
 
     rootObject->Update(elapsed);
-    collisionHandler.Handle();
+    particleHandler.Update(elapsed);
+    // collisionHandler.Handle();
 }
 
 void MinecraftEngine::OnClick(GLFWwindow* window, int button, int action, int mods)
@@ -126,7 +146,7 @@ void MinecraftEngine::OnClick(GLFWwindow* window, int button, int action, int mo
         isGlFill = !isGlFill;
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-        rootObject->children[0]->SetPosition(glm::vec3(rand() % 2, rand() % 2, rand() % 2));
+        particleHandler.isActive = !particleHandler.isActive;
 
     glPolygonMode(GL_FRONT_AND_BACK, (!isGlFill ? GL_LINE : GL_FILL));
 }

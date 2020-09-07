@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "CollisionHandler.h"
 #include "CollisionBox.h"
+#include "ParticleHandler.h"
 #include <iostream>
 #include <array>
 
@@ -32,5 +33,6 @@ private:
 	Player* player;
 	GLuint activeShader;
 	CollisionHandler collisionHandler;
+	ParticleHandler particleHandler;
 };
 
