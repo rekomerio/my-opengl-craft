@@ -1,23 +1,21 @@
 #pragma once
-#include "GameObject.h"
-#include "Mesh.h"
+#include "GameModel.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-class Particle : public GameObject
+class Particle : public GameModel
 {
 public:
 	Particle();
-	void Update(float elapsed) override;
-	void Render(float elapsed, GLuint activeShader);
+	void Update(float elapsed);
 
+	float lifeSpan, lifeLeft;
 	bool isAlive;
-	float lifeSpan;
-	float elapsedLife;
 
 	glm::vec4 color;
 	glm::vec3 velocity;
-	Mesh* mesh;
+
+	friend class ParticleHandler;
 };
 

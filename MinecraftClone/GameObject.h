@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <array>
 #include <glm/gtc/type_ptr.hpp>
+#include "GameModel.h"
 
 class GameObject
 {
@@ -10,12 +11,12 @@ public:
 	GameObject();
 	virtual ~GameObject();
 
-	virtual void Render(float elapsed, GLuint activeShader);
-	virtual void Update(float elapsed);
 	virtual void Rotate(float degrees, glm::vec3 axis);
 	virtual void SetPosition(glm::vec3 position);
-	glm::vec3 GetPosition() const { return m_Position; }
-	glm::vec3 GetRotation() const { return m_Rotation; }
+	virtual void Render(float elapsed, GLuint activeShader);
+	virtual void Update(float elapsed);
+	glm::vec3 GetPosition() const { return m_GameModel.GetPosition(); }
+	glm::vec3 GetRotation() const { return m_GameModel.GetRotation(); }
 
 	std::vector<GameObject*> children;
 	/// <summary>
@@ -24,8 +25,6 @@ public:
 	bool isStatic;
 
 protected:
-	glm::mat4 m_Model;
-	glm::vec3 m_Position;
-	glm::vec3 m_Rotation;
+	GameModel m_GameModel;
 };
 

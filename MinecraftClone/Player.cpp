@@ -48,5 +48,4 @@ void Player::SetPosition(glm::vec3 position)
 	glm::vec3 cameraPosition(position);
 	cameraPosition.y += 1.0f;
 	camera.SetPosition(cameraPosition);
-	//collisionBox.m_Position = position;
 }

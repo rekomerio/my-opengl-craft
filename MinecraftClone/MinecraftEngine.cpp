@@ -33,7 +33,6 @@ bool MinecraftEngine::OnCreate()
 
     GLuint vertexShader = CreateShader(GL_VERTEX_SHADER, "shaders/vertex.glsl");
     GLuint fragmentShader = CreateShader(GL_FRAGMENT_SHADER, "shaders/fragment.glsl");
-    GLuint asd = CreateShader(GL_FRAGMENT_SHADER, "shaders/particleFragment.glsl");
 
     if (!vertexShader)
         return false;
@@ -55,7 +54,10 @@ bool MinecraftEngine::OnCreate()
     // Particle mesh
     Mesh* particleMesh = new Mesh();
     particleMesh->GenerateCube(0.2f);
+    particleHandler.particleMesh = particleMesh;
     meshes.push_back(particleMesh);
+
+    particleHandler.position = glm::vec3(0.0f, 0.5f, 0.0f);
 
     // Block
     GLuint texture = LoadTexture("textures/container.jpg", GL_RGB);
@@ -83,6 +85,9 @@ bool MinecraftEngine::OnCreate()
 
     glUseProgram(activeShader);
     glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	return true;
 }
@@ -126,7 +131,6 @@ void MinecraftEngine::Update(float elapsed)
     
     {
         Particle particle;
-        particle.mesh = meshes[1];
         particle.velocity = glm::vec3(randf(-1.0f, 1.0f), randf(1.0f, 3.0f), randf(-1.0f, 1.0f));
         particle.lifeSpan = 2.0f;
         particle.color = glm::vec4(randf(0.75f, 1.0f), randf(0.75f, 1.0f), randf(0.0f, 0.1f), 1.0f);

@@ -1,6 +1,7 @@
 #pragma once
 #include "Particle.h"
 #include "Camera.h"
+#include "Mesh.h"
 #include <glm/glm.hpp>
 
 class ParticleHandler
@@ -11,8 +12,10 @@ public:
 	void Render(float elapsed, GLuint activeShader);
 	void Emit(Particle particle);
 
-	glm::vec3 position; 
 	bool isActive; 
+	glm::vec3 position; 
+	GLuint particleTexture;
+	Mesh* particleMesh;
 private:
 	std::vector<Particle> particles;
 	int particleIndex;

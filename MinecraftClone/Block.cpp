@@ -18,6 +18,7 @@ Block::~Block()
 
 void Block::Render(float elapsed, GLuint activeShader)
 {
+    // TODO: Sort game objects by texture so less OpenGl calls will be made
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureId);
 
@@ -28,7 +29,5 @@ void Block::Render(float elapsed, GLuint activeShader)
 
 void Block::Update(float elapsed)
 {
-    // Rotate(elapsed * 10, glm::vec3(0.0f, 1.0f, 0.0f));
-    // std::cout << GetRotation().x << std::endl;
     GameObject::Update(elapsed);
 }

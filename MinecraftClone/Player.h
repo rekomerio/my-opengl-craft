@@ -1,7 +1,6 @@
 #pragma once
 #include "GameObject.h"
 #include "Camera.h"
-#include "CollisionBox.h"
 #include "Mesh.h"
 
 class Player : public GameObject
@@ -17,7 +16,6 @@ public:
 	void SetPosition(glm::vec3 position) override;
 
 	Camera camera;
-	CollisionBox collisionBox;
 	Mesh* mesh;
 	GLuint textureId;
 };

@@ -180,6 +180,7 @@
     <ClCompile Include="CollisionBox.cpp" />
     <ClCompile Include="CollisionHandler.cpp" />
     <ClCompile Include="GameEngineBase.cpp" />
+    <ClCompile Include="GameModel.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="CollisionBox.h" />
     <ClInclude Include="CollisionHandler.h" />
     <ClInclude Include="GameEngineBase.h" />
+    <ClInclude Include="GameModel.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MinecraftEngine.h" />
