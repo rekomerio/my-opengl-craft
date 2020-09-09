@@ -11,7 +11,7 @@ GameModel::~GameModel()
 {
 }
 
-void GameModel::ApplyModelToProgram(float elapsed, GLuint activeShader)
+void GameModel::ApplyModelToProgram(GLuint activeShader)
 {
 	GLuint modelLocation = glGetUniformLocation(activeShader, "model");
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(m_Model));

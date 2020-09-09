@@ -57,7 +57,7 @@ bool MinecraftEngine::OnCreate()
     particleHandler.particleMesh = particleMesh;
     meshes.push_back(particleMesh);
 
-    particleHandler.position = glm::vec3(0.0f, 0.5f, 0.0f);
+    particleHandler.position = glm::vec3(-1.0f, 0.0f, -1.0f);
 
     // Block
     GLuint texture = LoadTexture("textures/container.jpg", GL_RGB);
@@ -69,15 +69,26 @@ bool MinecraftEngine::OnCreate()
     // Player must be first in list so it gets rendered first and camera applied to shader
     rootObject->children.push_back(player);
 
-    for (size_t x = 0; x < 5; x++)
-        for (size_t z = 0; z < 5; z++)
-        {
-            Block* block = new Block(glm::vec3(x, 0.0f, z));
-            block->mesh = blockMesh;
-            block->textureId = texture;
-            rootObject->children.push_back(block);
-            collisionHandler.AddCollisionBox(glm::vec3(0.5f), block);
-        }
+    {
+        Chunk* chunk = new Chunk(glm::vec3(0.0f));
+        chunk->Generate(blockMesh, textures);
+        chunks.push_back(chunk);
+    }
+    {
+        Chunk* chunk = new Chunk(glm::vec3(17.0f, 0.0f, 0.0f));
+        chunk->Generate(blockMesh, textures);
+        chunks.push_back(chunk);
+    }
+    {
+        Chunk* chunk = new Chunk(glm::vec3(17.0f, 0.0f, 17.0f));
+        chunk->Generate(blockMesh, textures);
+        chunks.push_back(chunk);
+    }
+    {
+        Chunk* chunk = new Chunk(glm::vec3(0.0f, 0.0f, 17.0f));
+        chunk->Generate(blockMesh, textures);
+        chunks.push_back(chunk);
+    }
 
     player->mesh = blockMesh;
     player->textureId = texture;
@@ -98,7 +109,13 @@ void MinecraftEngine::Render(float elapsed)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUniform1i(glGetUniformLocation(activeShader, "useTexture"), 1);
+    
     rootObject->Render(elapsed, activeShader);
+
+    for (auto& chunk : chunks)
+    {
+        chunk->Render(elapsed, activeShader);
+    }
 
     glUniform1i(glGetUniformLocation(activeShader, "useTexture"), 0);
     particleHandler.Render(elapsed, activeShader);
@@ -112,22 +129,26 @@ void MinecraftEngine::Render(float elapsed)
 
 void MinecraftEngine::Update(float elapsed)
 {
-    float cameraSpeed = elapsed * 5.0f;
+    float playerSpeed = elapsed * 7.5f;
 
     auto randf = [](float min, float max) { return ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * (max - min)) + min; };
 
+    bool doubleSpeed = glfwGetKey(m_Window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
+
+    if (doubleSpeed) playerSpeed *= 2.0f;
+
     if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
-        player->MoveRelativeToDirection(cameraSpeed, 0.0f, 0.0f);
+        player->MoveRelativeToDirection(playerSpeed, 0.0f, 0.0f);
     if (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS)
-        player->MoveRelativeToDirection(-cameraSpeed, 0.0f, 0.0f);
+        player->MoveRelativeToDirection(-playerSpeed, 0.0f, 0.0f);
     if (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS)
-        player->MoveRelativeToDirection(0.0f, 0.0f, cameraSpeed);
+        player->MoveRelativeToDirection(0.0f, 0.0f, playerSpeed);
     if (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS)
-        player->MoveRelativeToDirection(0.0f, 0.0f, -cameraSpeed);
+        player->MoveRelativeToDirection(0.0f, 0.0f, -playerSpeed);
     if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        player->MoveRelativeToDirection(0.0f, cameraSpeed, 0.0f);
+        player->MoveRelativeToDirection(0.0f, playerSpeed, 0.0f);
     if (glfwGetKey(m_Window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        player->MoveRelativeToDirection(0.0f, -cameraSpeed, 0.0f);
+        player->MoveRelativeToDirection(0.0f, -playerSpeed, 0.0f);
     
     {
         Particle particle;
@@ -138,6 +159,10 @@ void MinecraftEngine::Update(float elapsed)
     }
 
     rootObject->Update(elapsed);
+    for (auto& chunk : chunks)
+    {
+        chunk->Render(elapsed, activeShader);
+    }
     particleHandler.Update(elapsed);
     // collisionHandler.Handle();
 }

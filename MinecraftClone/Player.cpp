@@ -13,13 +13,14 @@ Player::~Player()
 void Player::Render(float elapsed, GLuint activeShader)
 {
 	camera.ApplyToProgram(activeShader);
-
+	/*
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 
 	mesh->Render();
 
 	GameObject::Render(elapsed, activeShader);
+	*/
 }
 
 void Player::MoveRelativeToDirection(float forward, float up, float left)

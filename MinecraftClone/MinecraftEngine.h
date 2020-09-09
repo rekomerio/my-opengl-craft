@@ -1,11 +1,11 @@
 #pragma once
 #include "GameEngineBase.h"
-#include "Block.h"
+//#include "Block.h"
 #include "Player.h"
 #include "CollisionHandler.h"
 #include "CollisionBox.h"
 #include "ParticleHandler.h"
-#include <iostream>
+#include "Chunk.h"
 #include <array>
 
 class MinecraftEngine : public GameEngineBase
@@ -34,5 +34,6 @@ private:
 	GLuint activeShader;
 	CollisionHandler collisionHandler;
 	ParticleHandler particleHandler;
+	std::vector<Chunk*> chunks;
 };
 

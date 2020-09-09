@@ -9,7 +9,7 @@ public:
 	GameModel();
 	virtual ~GameModel();
 
-	virtual void ApplyModelToProgram(float elapsed, GLuint activeShader);
+	virtual void ApplyModelToProgram(GLuint activeShader);
 	virtual void Rotate(float degrees, glm::vec3 axis);
 	virtual void SetPosition(glm::vec3 position);
 	glm::vec3 GetPosition() const { return m_Position; }

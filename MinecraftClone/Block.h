@@ -1,21 +1,18 @@
 #pragma once
-#include "GameObject.h"
+#include "GameModel.h"
 #include "Mesh.h"
-#include "MinecraftEngine.h"
-#include "CollisionBox.h"
 
-class Block : public GameObject
+class Block : public GameModel
 {
 public:
 	Block();
 	Block(glm::vec3 position);
 	~Block();
 
-	void Render(float elapsed, GLuint activeShader) override;
-	void Update(float elapsed) override;
+	void Render(float elapsed, GLuint activeShader);
+	void Update(float elapsed);
 
 	GLuint textureId;
 	Mesh* mesh;
-	CollisionBox collisionBox;
 };
 

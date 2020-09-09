@@ -30,7 +30,7 @@ void GameObject::Render(float elapsed, GLuint activeShader)
 	std::vector<GameObject*>::iterator it;
 	for (it = children.begin(); it != children.end(); it++)
 	{
-		(*it)->m_GameModel.ApplyModelToProgram(elapsed, activeShader);
+		(*it)->m_GameModel.ApplyModelToProgram(activeShader);
 		(*it)->Render(elapsed, activeShader);
 	}
 }

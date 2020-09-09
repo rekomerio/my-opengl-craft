@@ -9,7 +9,7 @@ Block::Block()
 Block::Block(glm::vec3 position)
 {
     Block();
-    GameObject::SetPosition(position);
+    GameModel::SetPosition(position);
 }
 
 Block::~Block()
@@ -22,12 +22,14 @@ void Block::Render(float elapsed, GLuint activeShader)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureId);
 
+    GameModel::ApplyModelToProgram(activeShader);
+
     mesh->Render();
     // Render children of this Block
-    GameObject::Render(elapsed, activeShader);
+   // GameObject::Render(elapsed, activeShader);
 }
 
 void Block::Update(float elapsed)
 {
-    GameObject::Update(elapsed);
+    //GameObject::Update(elapsed);
 }
