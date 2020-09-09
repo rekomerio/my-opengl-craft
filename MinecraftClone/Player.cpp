@@ -27,7 +27,8 @@ void Player::MoveRelativeToDirection(float forward, float up, float left)
 {
 	camera.MoveRelativeToDirection(forward, up, left);
 	glm::vec3 playerPosition(camera.GetPosition());
-	playerPosition.y -= 1.0f;
+	// Lower position to get camera to show up higher than center of the player
+	playerPosition.y -= 1.0f; 
 	GameObject::SetPosition(playerPosition);
 }
 

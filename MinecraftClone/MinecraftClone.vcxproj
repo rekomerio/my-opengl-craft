@@ -178,6 +178,7 @@
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Chunk.cpp" />
+    <ClCompile Include="ChunkHandler.cpp" />
     <ClCompile Include="CollisionBox.cpp" />
     <ClCompile Include="CollisionHandler.cpp" />
     <ClCompile Include="GameEngineBase.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="Block.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Chunk.h" />
+    <ClInclude Include="ChunkHandler.h" />
     <ClInclude Include="CollisionBox.h" />
     <ClInclude Include="CollisionHandler.h" />
     <ClInclude Include="GameEngineBase.h" />

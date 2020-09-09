@@ -5,7 +5,7 @@
 #include "CollisionHandler.h"
 #include "CollisionBox.h"
 #include "ParticleHandler.h"
-#include "Chunk.h"
+#include "ChunkHandler.h"
 #include <array>
 
 class MinecraftEngine : public GameEngineBase
@@ -34,6 +34,6 @@ private:
 	GLuint activeShader;
 	CollisionHandler collisionHandler;
 	ParticleHandler particleHandler;
-	std::vector<Chunk*> chunks;
+	ChunkHandler chunkHandler;
 };
 

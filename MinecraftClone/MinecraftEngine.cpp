@@ -63,32 +63,16 @@ bool MinecraftEngine::OnCreate()
     GLuint texture = LoadTexture("textures/container.jpg", GL_RGB);
     textures.push_back(texture);
 
+    chunkHandler.blockMesh = blockMesh;
+    chunkHandler.blockTextures.push_back(texture);
+
+    chunkHandler.SetRenderDistance(4);
+
     player = new Player();
     player->isStatic = false;
     collisionHandler.AddCollisionBox(glm::vec3(0.5f), player);
     // Player must be first in list so it gets rendered first and camera applied to shader
     rootObject->children.push_back(player);
-
-    {
-        Chunk* chunk = new Chunk(glm::vec3(0.0f));
-        chunk->Generate(blockMesh, textures);
-        chunks.push_back(chunk);
-    }
-    {
-        Chunk* chunk = new Chunk(glm::vec3(17.0f, 0.0f, 0.0f));
-        chunk->Generate(blockMesh, textures);
-        chunks.push_back(chunk);
-    }
-    {
-        Chunk* chunk = new Chunk(glm::vec3(17.0f, 0.0f, 17.0f));
-        chunk->Generate(blockMesh, textures);
-        chunks.push_back(chunk);
-    }
-    {
-        Chunk* chunk = new Chunk(glm::vec3(0.0f, 0.0f, 17.0f));
-        chunk->Generate(blockMesh, textures);
-        chunks.push_back(chunk);
-    }
 
     player->mesh = blockMesh;
     player->textureId = texture;
@@ -112,10 +96,7 @@ void MinecraftEngine::Render(float elapsed)
     
     rootObject->Render(elapsed, activeShader);
 
-    for (auto& chunk : chunks)
-    {
-        chunk->Render(elapsed, activeShader);
-    }
+    chunkHandler.Render(elapsed, activeShader, *player);
 
     glUniform1i(glGetUniformLocation(activeShader, "useTexture"), 0);
     particleHandler.Render(elapsed, activeShader);
@@ -159,10 +140,7 @@ void MinecraftEngine::Update(float elapsed)
     }
 
     rootObject->Update(elapsed);
-    for (auto& chunk : chunks)
-    {
-        chunk->Render(elapsed, activeShader);
-    }
+
     particleHandler.Update(elapsed);
     // collisionHandler.Handle();
 }

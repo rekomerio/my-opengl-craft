@@ -39,7 +39,7 @@ void Chunk::Update(float elapsed)
 	}
 }
 
-void Chunk::Generate(Mesh* mesh, std::vector<GLuint> textures, int seed)
+void Chunk::Generate(Mesh* mesh, std::vector<GLuint>& textures, int seed)
 {
 	if (isGenerated) return;
 
