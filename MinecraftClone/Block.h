@@ -9,7 +9,7 @@ public:
 	Block(glm::vec3 position);
 	~Block();
 
-	void Render(float elapsed, GLuint activeShader);
+	void Render(float elapsed, GLuint activeShader, GLuint modelLocation);
 	void Update(float elapsed);
 
 	GLuint textureId;

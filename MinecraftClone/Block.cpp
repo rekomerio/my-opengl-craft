@@ -16,13 +16,14 @@ Block::~Block()
 {
 }
 
-void Block::Render(float elapsed, GLuint activeShader)
+void Block::Render(float elapsed, GLuint activeShader, GLuint modelLocation)
 {
     // TODO: Sort game objects by texture so less OpenGl calls will be made
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureId);
 
-    GameModel::ApplyModelToProgram(activeShader);
+    // GameModel::ApplyModelToProgram(activeShader);
+    glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(m_Model));
 
     mesh->Render();
     // Render children of this Block

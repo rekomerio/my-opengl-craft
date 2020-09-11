@@ -17,6 +17,8 @@ Chunk::~Chunk()
 
 void Chunk::Render(float elapsed, GLuint activeShader)
 {
+	GLuint modelLocation = glGetUniformLocation(activeShader, "model");
+
 	for (auto& block : blocks)
 	{
 		if (!block) continue;
@@ -26,7 +28,7 @@ void Chunk::Render(float elapsed, GLuint activeShader)
 		
 		// Render outer layer
 		if (pos.x > 14 || pos.y > 14 || pos.z > 14 || pos.x < 1 || pos.y < 1 || pos.z < 1)
-		block->Render(elapsed, activeShader);
+		block->Render(elapsed, activeShader, modelLocation);
 	}
 }
 
@@ -43,11 +45,11 @@ void Chunk::Generate(Mesh* mesh, std::vector<GLuint>& textures, int seed)
 {
 	if (isGenerated) return;
 
-	auto xyz = [](int x, int y, int z) { return x + 16 * (y + 16 * z); };
+	auto xyz = [](int x, int y, int z) { return x + CHUNK_SIZE * (y + CHUNK_SIZE * z); };
 
-	for (size_t x = 0; x < 16; x++)
-		for (size_t y = 0; y < 16; y++)
-			for (size_t z = 0; z < 16; z++)
+	for (size_t x = 0; x < CHUNK_SIZE; x++)
+		for (size_t y = 0; y < CHUNK_SIZE; y++)
+			for (size_t z = 0; z < CHUNK_SIZE; z++)
 			{
 				blocks[xyz(x, y, z)] = new Block(glm::vec3(x, y, z) + m_Position);
 				blocks[xyz(x, y, z)]->mesh = mesh;
