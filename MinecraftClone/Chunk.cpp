@@ -56,3 +56,14 @@ void Chunk::Generate(Mesh* mesh, std::vector<GLuint>& textures, int seed)
 
 	isGenerated = true;
 }
+
+void Chunk::SetPosition(glm::vec3 position)
+{
+	for (auto& block : blocks)
+	{
+		if (!block) continue;
+
+		block->SetPosition(block->GetPosition() + position - m_Position);
+	}
+	m_Position = position;
+}

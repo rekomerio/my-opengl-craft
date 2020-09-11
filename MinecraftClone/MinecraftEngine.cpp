@@ -110,7 +110,7 @@ void MinecraftEngine::Render(float elapsed)
 
 void MinecraftEngine::Update(float elapsed)
 {
-    float playerSpeed = elapsed * 7.5f;
+    float playerSpeed = elapsed * 15.0f;
 
     auto randf = [](float min, float max) { return ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * (max - min)) + min; };
 
@@ -140,7 +140,7 @@ void MinecraftEngine::Update(float elapsed)
     }
 
     rootObject->Update(elapsed);
-
+    chunkHandler.Update(elapsed, *player);
     particleHandler.Update(elapsed);
     // collisionHandler.Handle();
 }
