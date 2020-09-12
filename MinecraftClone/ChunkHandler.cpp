@@ -4,7 +4,6 @@ ChunkHandler::ChunkHandler()
 {
 	m_RenderDistance = 4;
 	blockMesh = nullptr;
-	m_ClosestChunk = nullptr;
 	m_LastPlayerPosition = glm::vec3(0.0f);
 }
 
@@ -57,11 +56,8 @@ bool ChunkHandler::IsChunkInRenderDistance(const Chunk* chunk, const glm::vec3& 
 
 bool ChunkHandler::IsChunkHere(const Chunk* chunk, const glm::vec3& position) const
 {
-	glm::vec3 chunkPos = chunk->GetPosition();
-	return (
-		(int)chunkPos.x == (int)position.x && 
-		(int)chunkPos.y == (int)position.y && 
-		(int)chunkPos.z == (int)position.z);
+	// Potential bug on overflow?
+	return glm::i32vec3(chunk->GetPosition()) == glm::i32vec3(position);
 }
 
 bool ChunkHandler::IsAnyChunkHere(const glm::vec3& position) const
@@ -87,12 +83,13 @@ Chunk* ChunkHandler::GetClosestChunk(const glm::vec3& position) const
 
 void ChunkHandler::CalculateChunkPositions(const glm::vec3 center, std::vector<glm::vec3>& positions) const
 {
-	glm::vec3 startingCorner = center - glm::vec3(m_RenderDistance * CHUNK_SIZE, 0.0f, m_RenderDistance * CHUNK_SIZE);
+	glm::vec3 startingCorner = center - glm::vec3(m_RenderDistance * CHUNK_SIZE);
+	size_t distance = static_cast<size_t>(m_RenderDistance) * 2;
 
-	for (size_t x = 0; x < m_RenderDistance * 2; x++)
-		//for (size_t y = 0; y < m_RenderDistance * 2; y++)
-			for (size_t z = 0; z < m_RenderDistance * 2; z++)
-				positions.push_back(startingCorner + glm::vec3(x * CHUNK_SIZE, 0, z * CHUNK_SIZE));
+	for (size_t x = 0; x < distance; x++)
+		for (size_t y = 0; y < distance; y++)
+			for (size_t z = 0; z < distance; z++)
+				positions.push_back(startingCorner + glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE));
 }
 
 void ChunkHandler::MoveChunks(const glm::vec3 center)
@@ -123,21 +120,15 @@ void ChunkHandler::MoveChunks(const glm::vec3 center)
 	}
 
 	std::atomic_int index = 0;
-	std::mutex mutex;
 
 	auto task = [&]()
 	{
 		while (index < chunksToMove.size() - 1)
 		{
-			mutex.lock();
-			glm::vec3 position = emptyPositions[index];
-			Chunk* chunk = chunksToMove[index];
-			index++;
-			mutex.unlock();
-
-			chunk->SetPosition(position);	
+			int i = index++;
+			chunksToMove[i]->SetPosition(emptyPositions[i]);
 		}
-	};
+  	};
 
 	std::thread t1(task);
 	std::thread t2(task);
@@ -157,7 +148,7 @@ void ChunkHandler::MoveChunks(const glm::vec3 center)
 glm::vec3 ChunkHandler::ToChunkPosition(glm::vec3 position) const
 {
 	position.x = (int)position.x - (int)position.x % CHUNK_SIZE;
-	position.y = 0; //(int)position.y + (int)position.y % CHUNK_SIZE;
+	position.y = (int)position.y - (int)position.y % CHUNK_SIZE;
 	position.z = (int)position.z - (int)position.z % CHUNK_SIZE;
 
 	return position;
@@ -171,10 +162,12 @@ void ChunkHandler::GenerateChunks()
 	chunks.clear();
 
 	for (size_t x = 0; x < m_RenderDistance * 2; x++)
-		for (size_t z = 0; z < m_RenderDistance * 2; z++)
-		{
-			Chunk* chunk = new Chunk(glm::vec3(x * CHUNK_SIZE, 0.0f, z * CHUNK_SIZE));
-			chunk->Generate(blockMesh, blockTextures);
-			chunks.push_back(chunk);
-		}
+		for (size_t y = 0; y < m_RenderDistance * 2; y++)
+			for (size_t z = 0; z < m_RenderDistance * 2; z++)
+			{
+				Chunk* chunk = new Chunk(glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE));
+				chunk->Generate(blockMesh);
+				chunk->textures = &blockTextures;
+				chunks.push_back(chunk);
+			}
 }

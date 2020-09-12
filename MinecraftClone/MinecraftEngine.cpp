@@ -60,13 +60,25 @@ bool MinecraftEngine::OnCreate()
     particleHandler.position = glm::vec3(-1.0f, 0.0f, -1.0f);
 
     // Block
-    GLuint texture = LoadTexture("textures/container.jpg", GL_RGB);
-    textures.push_back(texture);
+    {
+        GLuint texture = LoadTexture("textures/dirt.jpg", GL_RGB);
+        textures.push_back(texture);
+        chunkHandler.blockTextures.push_back(texture);
+    }
+    {
+        GLuint texture = LoadTexture("textures/stone.jpg", GL_RGB);
+        textures.push_back(texture);
+        chunkHandler.blockTextures.push_back(texture);
+    }
+    {
+        GLuint texture = LoadTexture("textures/sand.jpg", GL_RGB);
+        textures.push_back(texture);
+        chunkHandler.blockTextures.push_back(texture);
+    }
 
     chunkHandler.blockMesh = blockMesh;
-    chunkHandler.blockTextures.push_back(texture);
 
-    chunkHandler.SetRenderDistance(4);
+    chunkHandler.SetRenderDistance(3);
 
     player = new Player();
     player->isStatic = false;
@@ -75,7 +87,7 @@ bool MinecraftEngine::OnCreate()
     rootObject->children.push_back(player);
 
     player->mesh = blockMesh;
-    player->textureId = texture;
+    // player->textureId = texture;
     player->SetPosition(glm::vec3(-3.0f, 0.0f, 0.0f));
 
     glUseProgram(activeShader);

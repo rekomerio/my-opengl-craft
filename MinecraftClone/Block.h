@@ -2,6 +2,14 @@
 #include "GameModel.h"
 #include "Mesh.h"
 
+enum BlockType {
+	Dirt,
+	Stone, 
+	Sand,
+	Cobblestone,
+	None,
+};
+
 class Block : public GameModel
 {
 public:
@@ -12,7 +20,7 @@ public:
 	void Render(float elapsed, GLuint activeShader, GLuint modelLocation);
 	void Update(float elapsed);
 
-	GLuint textureId;
 	Mesh* mesh;
+	BlockType type;
 };
 

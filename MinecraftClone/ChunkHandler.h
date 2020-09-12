@@ -7,7 +7,6 @@
 #include <stack>
 #include <thread>
 #include <atomic>
-#include <mutex>
 
 class ChunkHandler
 {
@@ -24,7 +23,6 @@ public:
 	std::vector<GLuint> blockTextures;
 
 private:
-	Chunk* m_ClosestChunk;
 	void GenerateChunks();
 	float GetDistanceToChunk(const Chunk* chunk, const glm::vec3& position) const;
 	bool IsChunkInRenderDistance(const Chunk* chunk, const glm::vec3& position) const;
