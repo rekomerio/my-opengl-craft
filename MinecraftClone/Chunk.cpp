@@ -15,26 +15,25 @@ Chunk::~Chunk()
 	}
 }
 
-void Chunk::Render(float elapsed, GLuint activeShader)
+void Chunk::Render(float elapsed, GLuint activeShader, Player& player)
 {
 	GLuint modelLocation = glGetUniformLocation(activeShader, "model");
 
-	std::vector<Block*> sortedBlocks(blocks.size());
-	std::copy(blocks.begin(), blocks.end(), sortedBlocks.begin());
-	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [](Block* a, Block* b) { return a->type < b->type; });
-	
-	BlockType blockType = BlockType::None;
+	Block::Type blockType = Block::Type::None;
 
-	for (auto& block : sortedBlocks)
+	for (auto& block : m_SortedBlocks)
 	{
 		if (!block) continue;
-		// TODO: Do some check here to only render blocks that are visible
-		
+		if (!player.camera.IsPointInView(block->GetPosition())) continue;
+
+		// TODO: Check is block behind another visible block
+		auto pos = block->GetPosition();
+
 		if (block->type != blockType)
 		{
 			blockType = block->type;
 
-			if (blockType != BlockType::None)
+			if (blockType != Block::Type::None)
 			{
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, (*textures)[blockType]);
@@ -68,6 +67,7 @@ void Chunk::Generate(Mesh* mesh, int seed)
 				blocks[xyz(x, y, z)]->mesh = mesh;
 			}
 
+	m_SortedBlocks.resize(CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
 	isGenerated = true;
 }
 
@@ -87,25 +87,27 @@ void Chunk::SetPosition(glm::vec3 position)
 				bool isVisible = rndInt(0, 100) < (100 - (blockPosition.y * 0.75f));
 
 				if (y > 0) 
-					isVisible &= blocks[xyz(x, y - 1, z)]->type != BlockType::None;
+					isVisible &= blocks[xyz(x, y - 1, z)]->type != Block::Type::None;
 
-				BlockType average = CalculateSurroundingAverage(x, y, z);
+				Block::Type average = CalculateDominatingBlockType(x, y, z);
 
-				bool generateNew = rndInt(0, 100) < 10;
+				bool generateNew = rndInt(0, 100) < (average == Block::Type::None ? 80 : 20);
 
-				float depth = fmin(fmax(position.y, 0.0f), 100.0f) * 0.03f;
+				// float depth = fmin(fmax(position.y, 0.0f), 100.0f) * 0.03f;
 
-				blocks[xyz(x, y, z)]->type = generateNew ? (BlockType)rndInt(0, std::max((int)depth, 1)) : average;
+				blocks[xyz(x, y, z)]->type = generateNew ? (Block::Type)rndInt(0, 4) : average;
 				
-				// Deeper should have more stone
+				// TODO: Deeper should have more stone
 
-				blocks[xyz(x, y, z)]->type = (isVisible ? blocks[xyz(x, y, z)]->type : BlockType::None);
+				blocks[xyz(x, y, z)]->type = (position.y < 16 ? blocks[xyz(x, y, z)]->type : Block::Type::None);
 			}
+
+	SortBlocksByTexture();
 
 	m_Position = position;
 }
 
-BlockType Chunk::CalculateSurroundingAverage(int xx, int yy, int zz) const
+Block::Type Chunk::CalculateSurroundingAverage(int xx, int yy, int zz) const
 {
 	auto xyz = [](int x, int y, int z) { return x + CHUNK_SIZE * (y + CHUNK_SIZE * z); };
 
@@ -124,13 +126,40 @@ BlockType Chunk::CalculateSurroundingAverage(int xx, int yy, int zz) const
 	if (average > 0)
 		average /= nCalculations;
 
-	return (BlockType)average;
+	return (Block::Type)average;
+}
+
+Block::Type Chunk::CalculateDominatingBlockType(int xx, int yy, int zz) const
+{
+	auto xyz = [](int x, int y, int z) { return x + CHUNK_SIZE * (y + CHUNK_SIZE * z); };
+	std::unordered_map<Block::Type, int> map;
+
+	for (int x = -1; x < 1; x++)
+		for (int y = -1; y < 1; y++)
+			for (int z = -1; z < 1; z++)
+				if (xx + x < CHUNK_SIZE && xx + x > 0 && yy + y < CHUNK_SIZE && yy + y > 0 && zz + z < CHUNK_SIZE && zz + z > 0)
+				{
+					Block::Type type = blocks[xyz(xx + x, yy + y, zz + z)]->type;
+
+					if (map.find(type) != map.end())
+						map.at(type)++;
+					else
+						map.insert(std::make_pair(type, 1));
+				}
+
+	std::pair<Block::Type, int> dominatingPair = std::make_pair(Block::Type::None, 0);
+	
+	for (auto pair : map)
+	{
+		if (pair.second > dominatingPair.second)
+			dominatingPair = pair;
+	}
+
+	return dominatingPair.first;
 }
 
 void Chunk::SortBlocksByTexture()
 {
-	// Create temp vector with same size and copy contents
-	std::vector<Block*> sortedBlocks(blocks.size());
-	std::copy(blocks.begin(), blocks.end(), sortedBlocks.begin());
-	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [](Block* a, Block* b) { return a->type < b->type; });
+	std::copy(blocks.begin(), blocks.end(), m_SortedBlocks.begin());
+	std::sort(m_SortedBlocks.begin(), m_SortedBlocks.end(), [](Block* a, Block* b) { return a->type < b->type; });
 }

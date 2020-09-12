@@ -2,17 +2,17 @@
 #include "GameModel.h"
 #include "Mesh.h"
 
-enum BlockType {
-	Dirt,
-	Stone, 
-	Sand,
-	Cobblestone,
-	None,
-};
-
 class Block : public GameModel
 {
 public:
+	enum Type {
+		Dirt,
+		Stone,
+		Sand,
+		None,
+		Cobblestone,
+	};
+
 	Block();
 	Block(glm::vec3 position);
 	~Block();
@@ -21,6 +21,6 @@ public:
 	void Update(float elapsed);
 
 	Mesh* mesh;
-	BlockType type;
+	Block::Type type;
 };
 

@@ -181,6 +181,8 @@
     <ClCompile Include="ChunkHandler.cpp" />
     <ClCompile Include="CollisionBox.cpp" />
     <ClCompile Include="CollisionHandler.cpp" />
+    <ClCompile Include="frustum\AABox.cpp" />
+    <ClCompile Include="frustum\Plane.cpp" />
     <ClCompile Include="GameEngineBase.cpp" />
     <ClCompile Include="GameModel.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -198,6 +200,8 @@
     <ClInclude Include="ChunkHandler.h" />
     <ClInclude Include="CollisionBox.h" />
     <ClInclude Include="CollisionHandler.h" />
+    <ClInclude Include="frustum\AABox.h" />
+    <ClInclude Include="frustum\Plane.h" />
     <ClInclude Include="GameEngineBase.h" />
     <ClInclude Include="GameModel.h" />
     <ClInclude Include="GameObject.h" />

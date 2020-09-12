@@ -63,6 +63,12 @@
     <ClCompile Include="ChunkHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="frustum\AABox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frustum\Plane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameEngineBase.h">
@@ -108,6 +114,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ChunkHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frustum\AABox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frustum\Plane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

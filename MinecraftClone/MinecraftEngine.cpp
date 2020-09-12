@@ -106,6 +106,7 @@ void MinecraftEngine::Render(float elapsed)
 
     glUniform1i(glGetUniformLocation(activeShader, "useTexture"), 1);
     
+    player->camera.PrepareForCulling();
     rootObject->Render(elapsed, activeShader);
 
     chunkHandler.Render(elapsed, activeShader, *player);

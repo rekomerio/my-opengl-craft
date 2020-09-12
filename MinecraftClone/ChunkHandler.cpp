@@ -13,20 +13,27 @@ ChunkHandler::~ChunkHandler()
 		delete chunk;
 }
 
-void ChunkHandler::Render(float elapsed, GLuint activeShader, const Player& player)
+void ChunkHandler::Render(float elapsed, GLuint activeShader, Player& player)
 {
 	glm::vec3 position = player.GetPosition();
 
+	int nDiscarded = 0;
 	for (auto& chunk : chunks)
 	{
 		if (!chunk) continue;
 
+		if (!player.camera.IsPointInView(chunk->GetPosition() + 8.0f))
+		{
+			nDiscarded++;
+			//continue;
+		}
 		if (IsChunkInRenderDistance(chunk, position))
-			chunk->Render(elapsed, activeShader);
+			chunk->Render(elapsed, activeShader, player);
 	}
+	std::cout << "nDiscarded: "<< nDiscarded << " Total: " << chunks.size() << "\n";
 }
 
-void ChunkHandler::Update(float elapsed, const Player& player)
+void ChunkHandler::Update(float elapsed, Player& player)
 {
 	glm::vec3 position = ToChunkPosition(player.GetPosition());
 
@@ -81,7 +88,7 @@ Chunk* ChunkHandler::GetClosestChunk(const glm::vec3& position) const
 	return closestChunk;
 }
 
-void ChunkHandler::CalculateChunkPositions(const glm::vec3 center, std::vector<glm::vec3>& positions) const
+void ChunkHandler::CalculateChunkPositions(const glm::vec3& center, std::vector<glm::vec3>& positions) const
 {
 	glm::vec3 startingCorner = center - glm::vec3(m_RenderDistance * CHUNK_SIZE);
 	size_t distance = static_cast<size_t>(m_RenderDistance) * 2;
@@ -92,7 +99,7 @@ void ChunkHandler::CalculateChunkPositions(const glm::vec3 center, std::vector<g
 				positions.push_back(startingCorner + glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE));
 }
 
-void ChunkHandler::MoveChunks(const glm::vec3 center)
+void ChunkHandler::MoveChunks(const glm::vec3& center)
 {
 	std::vector<glm::vec3> positions;
 	CalculateChunkPositions(center, positions);

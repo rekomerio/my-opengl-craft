@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
 #include <glm/common.hpp>
+#include <unordered_map>
 #include "Block.h"
+#include "Player.h"
 
 #define CHUNK_SIZE 16
 
@@ -11,18 +13,19 @@ public:
 	Chunk(glm::vec3 position);
 	~Chunk();
 
-	void Render(float elapsed, GLuint activeShader);
+	void Render(float elapsed, GLuint activeShader, Player& player);
 	void Update(float elapsed);
 	void Generate(Mesh* mesh, int seed = 0);
 	void SetPosition(glm::vec3 position);
-	BlockType CalculateSurroundingAverage(int x, int y, int z) const;
+	Block::Type CalculateSurroundingAverage(int x, int y, int z) const;
+	Block::Type CalculateDominatingBlockType(int x, int y, int z) const;
 	inline glm::vec3 GetPosition() const { return m_Position; }
 	
 	std::vector<Block*> blocks;
 	std::vector<GLuint>* textures;
 private:
 	void SortBlocksByTexture();
-
+	std::vector<Block*> m_SortedBlocks;
 	glm::vec3 m_Position;
 	bool isGenerated;
 

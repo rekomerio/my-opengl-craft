@@ -89,4 +89,54 @@ void Camera::UpdateCameraFront()
 void Camera::UpdateProjection()
 {
 	m_Projection = glm::perspective(glm::radians(m_Fov), m_AspectRatio, m_MinDistance, m_MaxDistance);
+
+	// Culling stuff
+	m_Tang = (float)tan(glm::radians(m_Fov) * 0.5);
+	m_Nh = m_MinDistance * m_Tang;
+	m_Nw = m_Nh * m_AspectRatio;
+	m_Fh = m_MaxDistance * m_Tang;
+	m_Fw = m_Fh * m_AspectRatio;
+}
+
+bool Camera::IsPointInView(const glm::vec3& point) const
+{
+	for (size_t i = 0; i < 6; i++)
+	{
+		if (m_Planes[i].DistanceTo(point) < 0)
+			return false;
+	}
+	return true;
+}
+
+void Camera::PrepareForCulling()
+{
+	glm::vec3 nc, fc, x, y, z;
+
+	z = m_Position - (m_Position + m_Front);
+	z = glm::normalize(z);
+
+	x = glm::cross(m_Up, z);
+	x = glm::normalize(x);
+
+	y = glm::cross(z, x);
+
+	nc = m_Position - z * m_MinDistance;
+	fc = m_Position - z * m_MaxDistance;
+
+	m_Ntl = nc + y * m_Nh - x * m_Nw;
+	m_Ntr = nc + y * m_Nh + x * m_Nw;
+	m_Nbl = nc - y * m_Nh - x * m_Nw;
+	m_Nbr = nc - y * m_Nh + x * m_Nw;
+
+	m_Ftl = fc + y * m_Fh - x * m_Fw;
+	m_Ftr = fc + y * m_Fh + x * m_Fw;
+	m_Fbl = fc - y * m_Fh - x * m_Fw;
+	m_Fbr = fc - y * m_Fh + x * m_Fw;
+
+	m_Planes[TOP].Set3Points(m_Ntr, m_Ntl, m_Ftl);
+	m_Planes[BOTTOM].Set3Points(m_Nbl, m_Nbr, m_Fbr);
+	m_Planes[LEFT].Set3Points(m_Ntl, m_Nbl, m_Fbl);
+	m_Planes[RIGHT].Set3Points(m_Nbr, m_Ntr, m_Fbr);
+	m_Planes[NEARP].Set3Points(m_Ntl, m_Ntr, m_Nbr);
+	m_Planes[FARP].Set3Points(m_Ftr, m_Ftl, m_Fbl);
 }
