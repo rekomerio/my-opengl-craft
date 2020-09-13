@@ -1,8 +1,6 @@
 #pragma once
 #include "GameEngineBase.h"
 #include "Player.h"
-#include "CollisionHandler.h"
-#include "CollisionBox.h"
 #include "ParticleHandler.h"
 #include "ChunkHandler.h"
 #include <array>
@@ -31,7 +29,6 @@ private:
 	GameObject* rootObject;
 	Player* player;
 	GLuint activeShader;
-	CollisionHandler collisionHandler;
 	ParticleHandler particleHandler;
 	ChunkHandler chunkHandler;
 };

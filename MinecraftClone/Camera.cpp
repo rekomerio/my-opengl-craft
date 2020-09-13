@@ -11,8 +11,8 @@ Camera::Camera()
 
 	m_AspectRatio = 800.0f / 600.0f;
 
-	m_MinDistance = 0.1f;
-	m_MaxDistance = 100.0f;
+	m_MinDistance = 0.5f;
+	m_MaxDistance = 80.0f;
 
 	UpdateCameraFront();
 	UpdateProjection();
@@ -106,6 +106,18 @@ bool Camera::IsPointInView(const glm::vec3& point) const
 			return false;
 	}
 	return true;
+}
+
+// Kinda works, but there are situations where none of the corners are in view but the box still is
+bool Camera::IsBoxInView(const glm::vec3& corner, const glm::vec3& size)
+{
+	for (size_t x = 0; x < 2; x++)
+		for (size_t y = 0; y < 2; y++)	
+			for (size_t z = 0; z < 2; z++)
+				if (IsPointInView(corner + (glm::vec3(x, y, z) * size)))
+					return true;
+
+	return false;
 }
 
 void Camera::PrepareForCulling()

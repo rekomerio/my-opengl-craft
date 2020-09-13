@@ -20,17 +20,21 @@ public:
 	Block::Type CalculateSurroundingAverage(int x, int y, int z) const;
 	Block::Type CalculateDominatingBlockType(int x, int y, int z) const;
 	inline glm::vec3 GetPosition() const { return m_Position; }
+	bool IsAnyFaceVisible(Block* block) const;
 	
 	std::vector<Block*> blocks;
 	std::vector<GLuint>* textures;
+
 private:
+	int XYZ(int x, int y, int z) const;
 	void SortBlocksByTexture();
 	std::vector<Block*> m_SortedBlocks;
 	glm::vec3 m_Position;
 	bool isGenerated;
 
 
-	/* Random */
+	// Random generation
+	// Code below is made by javidx9
 	uint32_t seed = 0;
 
 	double rndDouble(double min, double max)

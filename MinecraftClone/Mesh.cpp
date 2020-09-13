@@ -14,6 +14,7 @@ Mesh::~Mesh()
 
 void Mesh::Render() const
 {
+    
     glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, (sizeof(Vertex) * vertices.size()));
 }

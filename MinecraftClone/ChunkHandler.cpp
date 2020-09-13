@@ -5,6 +5,7 @@ ChunkHandler::ChunkHandler()
 	m_RenderDistance = 4;
 	blockMesh = nullptr;
 	m_LastPlayerPosition = glm::vec3(0.0f);
+	areCollisionsOn = false;
 }
 
 ChunkHandler::~ChunkHandler()
@@ -16,16 +17,17 @@ ChunkHandler::~ChunkHandler()
 void ChunkHandler::Render(float elapsed, GLuint activeShader, Player& player)
 {
 	glm::vec3 position = player.GetPosition();
+	glm::vec3 chunkSize = glm::vec3(16.0f);
 
 	int nDiscarded = 0;
 	for (auto& chunk : chunks)
 	{
 		if (!chunk) continue;
 
-		if (!player.camera.IsPointInView(chunk->GetPosition() + 8.0f))
+		if (!player.camera.IsBoxInView(chunk->GetPosition(), chunkSize))
 		{
 			nDiscarded++;
-			//continue;
+			continue;
 		}
 		if (IsChunkInRenderDistance(chunk, position))
 			chunk->Render(elapsed, activeShader, player);
@@ -39,7 +41,15 @@ void ChunkHandler::Update(float elapsed, Player& player)
 
 	if (position != m_LastPlayerPosition) 
 		MoveChunks(position);
-	
+
+	if (areCollisionsOn)
+		for (auto& chunk : chunks)
+			if (GetDistanceToChunk(chunk, player.GetPosition()) < 15.f)
+				for (auto& block : chunk->blocks)
+					if (block->type != Block::Type::None && glm::distance(block->GetPosition(), player.GetPosition()) < 2.0f)
+						m_CollisionHandler.Handle(&player, block);
+
+	position = ToChunkPosition(player.GetPosition());
 	m_LastPlayerPosition = position;
 }
 
@@ -136,6 +146,8 @@ void ChunkHandler::MoveChunks(const glm::vec3& center)
 			chunksToMove[i]->SetPosition(emptyPositions[i]);
 		}
   	};
+
+	// TODO: Use thread pool, this is too slow
 
 	std::thread t1(task);
 	std::thread t2(task);

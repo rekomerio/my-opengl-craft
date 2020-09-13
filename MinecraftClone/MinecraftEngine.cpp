@@ -78,11 +78,10 @@ bool MinecraftEngine::OnCreate()
 
     chunkHandler.blockMesh = blockMesh;
 
-    chunkHandler.SetRenderDistance(3);
+    chunkHandler.SetRenderDistance(4);
 
     player = new Player();
     player->isStatic = false;
-    collisionHandler.AddCollisionBox(glm::vec3(0.5f), player);
     // Player must be first in list so it gets rendered first and camera applied to shader
     rootObject->children.push_back(player);
 
@@ -112,7 +111,7 @@ void MinecraftEngine::Render(float elapsed)
     chunkHandler.Render(elapsed, activeShader, *player);
 
     glUniform1i(glGetUniformLocation(activeShader, "useTexture"), 0);
-    particleHandler.Render(elapsed, activeShader);
+    //particleHandler.Render(elapsed, activeShader);
 
     char buffer[128];
     // sprintf_s(buffer, "%d", (int)(1.0f / elapsed));
@@ -155,7 +154,6 @@ void MinecraftEngine::Update(float elapsed)
     rootObject->Update(elapsed);
     chunkHandler.Update(elapsed, *player);
     particleHandler.Update(elapsed);
-    // collisionHandler.Handle();
 }
 
 void MinecraftEngine::OnClick(GLFWwindow* window, int button, int action, int mods)
@@ -166,7 +164,9 @@ void MinecraftEngine::OnClick(GLFWwindow* window, int button, int action, int mo
         isGlFill = !isGlFill;
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-        particleHandler.isActive = !particleHandler.isActive;
+        chunkHandler.areCollisionsOn = !chunkHandler.areCollisionsOn;
+
+    std::cout << "Collision on: " << chunkHandler.areCollisionsOn << '\n';
 
     glPolygonMode(GL_FRONT_AND_BACK, (!isGlFill ? GL_LINE : GL_FILL));
 }

@@ -24,6 +24,7 @@ public:
 	inline float GetFov() const { return m_Fov; }
 	inline glm::vec3 GetPosition() const { return m_Position; }
 	bool IsPointInView(const glm::vec3& point) const;
+	bool IsBoxInView(const glm::vec3& corner, const glm::vec3& size);
 	/// <summary>
 	/// This function must be called when camera has been 
 	/// rotated or moved and culling is going to be done

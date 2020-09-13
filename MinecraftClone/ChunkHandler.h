@@ -2,6 +2,7 @@
 #include "Chunk.h"
 #include "Player.h"
 #include "Mesh.h"
+#include "CollisionHandler.h"
 #include <vector>
 #include <iostream>
 #include <stack>
@@ -21,6 +22,7 @@ public:
 	Mesh* blockMesh;
 	std::vector<Chunk*> chunks;
 	std::vector<GLuint> blockTextures;
+	bool areCollisionsOn;
 
 private:
 	void GenerateChunks();
@@ -41,5 +43,6 @@ private:
 	/// Position of last chunk player was at
 	/// </summary>
 	glm::vec3 m_LastPlayerPosition;
+	CollisionHandler m_CollisionHandler;
 };
 

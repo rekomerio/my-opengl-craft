@@ -18,45 +18,39 @@ void CollisionHandler::AddCollisionBox(glm::vec3 size, GameObject* gameObject)
 	m_CollisionObjects.push_back(std::make_pair(new CollisionBox(size), gameObject));
 }
 
-void CollisionHandler::Handle()
+void CollisionHandler::Handle(GameObject* a, GameModel* b)
 {
-	static int counter = 0;
+	constexpr float minDistance = 0.9995f;
 
-	// First move collision box to same place with game object
-	for (auto& pair : m_CollisionObjects)
-	{
-		if (pair.second == nullptr) continue;
+	glm::vec3 aPos = a->GetPosition();
+	glm::vec3 bPos = b->GetPosition();
+	glm::vec3 collision(aPos.x - bPos.x, aPos.y - bPos.y, aPos.z - bPos.z);
 
-		pair.first->m_Position = pair.second->GetPosition();
-		pair.first->m_Rotation = pair.second->GetRotation();
+	float stepSize = 0.1f;
+
+	while (abs(collision.x) < minDistance && abs(collision.y) < minDistance && abs(collision.z) < minDistance)
+	{	
+		float temp;
+
+		float smallestCollision = minDistance - abs(collision.x);
+
+		temp = minDistance - abs(collision.y);
+		if (temp < smallestCollision)
+			smallestCollision = temp;
+		
+		temp = minDistance - abs(collision.z);
+		if (temp < smallestCollision)
+			smallestCollision = temp;
+
+		stepSize = smallestCollision + 0.001f;
+		
+		aPos.x += ((collision.x > 0) ? stepSize : -stepSize);
+		aPos.y += ((collision.y > 0) ? stepSize : -stepSize);
+		aPos.z += ((collision.z > 0) ? stepSize : -stepSize);
+
+		collision = glm::vec3(aPos.x - bPos.x, aPos.y - bPos.y, aPos.z - bPos.z);
 	}
-	// Next check the collisions
-	for (size_t i = 0; i < m_CollisionObjects.size() - 1; i++)
-		for (size_t j = i + 1; j < m_CollisionObjects.size(); j++)
-		{
-			if (m_CollisionObjects[i].second->isStatic) continue;
-			if (m_CollisionObjects[i].first->IsCollidingWith(m_CollisionObjects[j].first))
-			{
-				//std::cout << "Collision " << ++counter << std::endl;
-				// Now move the first object so it no longer collides
-				// Move to direction (x, y, z) that collides the least amount
-				//glm::vec3 c = m_CollisionObjects[i].first->GetCollision(m_CollisionObjects[j].first);
-				//std::cout << "X: " << c.x << " Y: " << c.y << " Z: " << c.z << std::endl;
-				glm::vec3 c = m_CollisionObjects[i].first->GetCollision(m_CollisionObjects[j].first);
-				std::cout << "X: " << c.x << " Y: " << c.y << " Z: " << c.z << std::endl;
-				glm::vec3 cAbs = glm::abs(c);
 
-				if (cAbs.x > cAbs.y && cAbs.x > cAbs.z && fabs(c.x) < 1.0f)
-					m_CollisionObjects[i].first->m_Position.x += (c.x > 0.0f) ? (c.x - 1.0f) : (1.0f + c.x);
-				else if (cAbs.y > cAbs.x && cAbs.y > cAbs.z && fabs(c.y) < 1.0f)
-					m_CollisionObjects[i].first->m_Position.y += (c.y > 0.0f) ? (c.y - 1.0f) : (1.0f + c.y);
-				else if (cAbs.z > cAbs.y&& cAbs.z > cAbs.x&& fabs(c.z) < 1.0f)
-					m_CollisionObjects[i].first->m_Position.z += (c.z > 0.0f) ? (c.z - 1.0f) : (1.0f + c.z);
-
-				c = m_CollisionObjects[i].first->GetCollision(m_CollisionObjects[j].first);
-				std::cout << "X: " << c.x << " Y: " << c.y << " Z: " << c.z << std::endl;
-				m_CollisionObjects[i].second->SetPosition(m_CollisionObjects[i].first->m_Position);
-
-			}
-		}
+	if (aPos != a->GetPosition())
+		a->SetPosition(aPos);
 }
