@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include "Block.h"
 #include "Player.h"
+#include <iostream>
 
 #define CHUNK_SIZE 16
 
@@ -21,6 +22,8 @@ public:
 	Block::Type CalculateDominatingBlockType(int x, int y, int z) const;
 	inline glm::vec3 GetPosition() const { return m_Position; }
 	bool IsAnyFaceVisible(Block* block) const;
+	void CalculateVisibleBlocks(Player& player);
+	bool HasOnlyInvisibleCubes();
 	
 	std::vector<Block*> blocks;
 	std::vector<GLuint>* textures;

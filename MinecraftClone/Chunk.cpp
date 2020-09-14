@@ -3,6 +3,7 @@
 Chunk::Chunk(glm::vec3 position)
 {
 	blocks.resize(CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
+	m_SortedBlocks.resize(CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
 	m_Position = position;
 	isGenerated = false;
 }
@@ -26,11 +27,9 @@ void Chunk::Render(float elapsed, GLuint activeShader, Player& player)
 	for (auto& block : m_SortedBlocks)
 	{
 		if (!block) continue;
-		if (!player.camera.IsBoxInView(block->GetPosition(), blockSize)) continue;
-		if (!IsAnyFaceVisible(block)) continue;
+		if (block->isHidden) continue;
 		
 		// TODO: Check is block behind another visible block
-		auto pos = block->GetPosition();
 
 		if (block->type != blockType)
 		{
@@ -39,7 +38,7 @@ void Chunk::Render(float elapsed, GLuint activeShader, Player& player)
 			if (blockType != Block::Type::None)
 			{
 				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, (*textures)[blockType]);
+				glBindTexture(GL_TEXTURE_2D, (*textures)[blockType % textures->size()]);
 			}
 		}
 		block->Render(elapsed, activeShader, modelLocation);
@@ -63,41 +62,49 @@ void Chunk::Generate(Mesh* mesh, int seed)
 		for (size_t y = 0; y < CHUNK_SIZE; y++)
 			for (size_t z = 0; z < CHUNK_SIZE; z++)
 			{
-				blocks[XYZ(x, y, z)] = new Block(glm::vec3(x, y, z) + m_Position);
-				blocks[XYZ(x, y, z)]->mesh = mesh;
+				Block* block = new Block(glm::vec3(x, y, z) + m_Position);
+				block->mesh = mesh;
+
+				blocks[XYZ(x, y, z)] = block;
+				m_SortedBlocks[XYZ(x, y, z)] = block;
 			}
 
-	m_SortedBlocks.resize(CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
 	isGenerated = true;
 }
 
 void Chunk::SetPosition(glm::vec3 position)
 {
-	seed = ((int)position.x & 0xFF) << 24 | ((int)position.y & 0xFFFF) << 8 | ((int)position.z & 0xFF);
+	seed = ((int)position.x & 0xFF) << 24 | ((int)position.y & 0xFF) << 8 | ((int)position.z & 0xFF);
 
 	for (size_t x = 0; x < CHUNK_SIZE; x++)
 		for (size_t y = 0; y < CHUNK_SIZE; y++)
 			for (size_t z = 0; z < CHUNK_SIZE; z++)
 			{
-				glm::vec3 blockPosition = blocks[XYZ(x, y, z)]->GetPosition() + position - m_Position;
-				blocks[XYZ(x, y, z)]->SetPosition(blockPosition);
-				
-				bool isVisible = rndInt(0, 100) < (100 - (blockPosition.y * 0.75f));
+				int i = XYZ(x, y, z);
+				glm::vec3 blockPosition = blocks[i]->GetPosition() + position - m_Position;
+				blocks[i]->SetPosition(blockPosition);
+				blocks[i]->type = (Block::Type)rndInt(0, 4);
+			}
 
-				if (y > 0) 
-					isVisible &= blocks[XYZ(x, y - 1, z)]->type != Block::Type::None;
+	for (size_t x = 0; x < CHUNK_SIZE; x++)
+		for (size_t y = 0; y < CHUNK_SIZE; y++)
+			for (size_t z = 0; z < CHUNK_SIZE; z++)
+			{
+				int i = XYZ(x, y, z);
+				if (position.y > -0.1f)
+				{
+					blocks[i]->type = Block::Type::None;
+				}
+				else
+				{
+					Block::Type average = CalculateDominatingBlockType(x, y, z);
 
-				Block::Type average = CalculateDominatingBlockType(x, y, z);
+					bool generateNew = rndInt(0, 100) < (average == Block::Type::None ? 60 : 20);
 
-				bool generateNew = rndInt(0, 100) < (average == Block::Type::None ? 80 : 20);
+					blocks[i]->type = generateNew ? (Block::Type)rndInt(0, 4) : average;
 
-				// float depth = fmin(fmax(position.y, 0.0f), 100.0f) * 0.03f;
-
-				blocks[XYZ(x, y, z)]->type = generateNew ? (Block::Type)rndInt(0, 4) : average;
-				
-				// TODO: Deeper should have more stone
-
-				blocks[XYZ(x, y, z)]->type = (position.y < 16 ? blocks[XYZ(x, y, z)]->type : Block::Type::None);
+					// TODO: Deeper should have more stone
+				}
 			}
 
 	SortBlocksByTexture();
@@ -180,6 +187,25 @@ bool Chunk::IsAnyFaceVisible(Block* block) const
 	return false;
 }
 
+void Chunk::CalculateVisibleBlocks(Player& player)
+{
+	glm::vec3 blockSize = glm::vec3(1.0f);
+	
+	for (auto& block : blocks)
+	{
+		block->isHidden = (!player.camera.IsBoxInView(block->GetPosition(), blockSize) || !IsAnyFaceVisible(block) || block->type == Block::Type::None);
+	}
+}
+
+bool Chunk::HasOnlyInvisibleCubes()
+{
+	for (auto& block : blocks)
+		if (block->type != Block::Type::None) 
+			return false;
+	
+	return true;
+}
+
 int Chunk::XYZ(int x, int y, int z) const
 {
 	return x + CHUNK_SIZE * (y + CHUNK_SIZE * z);
@@ -187,6 +213,6 @@ int Chunk::XYZ(int x, int y, int z) const
 
 void Chunk::SortBlocksByTexture()
 {
-	std::copy(blocks.begin(), blocks.end(), m_SortedBlocks.begin());
+	//std::copy(blocks.begin(), blocks.end(), m_SortedBlocks.begin());
 	std::sort(m_SortedBlocks.begin(), m_SortedBlocks.end(), [](Block* a, Block* b) { return a->type < b->type; });
 }

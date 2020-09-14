@@ -6,6 +6,7 @@ ChunkHandler::ChunkHandler()
 	blockMesh = nullptr;
 	m_LastPlayerPosition = glm::vec3(0.0f);
 	areCollisionsOn = false;
+	threadPool.resize(std::thread::hardware_concurrency());
 }
 
 ChunkHandler::~ChunkHandler()
@@ -19,20 +20,27 @@ void ChunkHandler::Render(float elapsed, GLuint activeShader, Player& player)
 	glm::vec3 position = player.GetPosition();
 	glm::vec3 chunkSize = glm::vec3(16.0f);
 
-	int nDiscarded = 0;
+	std::vector<Chunk*> chunksToRender;
+
+	int nRendered = 0;
 	for (auto& chunk : chunks)
 	{
 		if (!chunk) continue;
-
-		if (!player.camera.IsBoxInView(chunk->GetPosition(), chunkSize))
-		{
-			nDiscarded++;
-			continue;
-		}
-		if (IsChunkInRenderDistance(chunk, position))
-			chunk->Render(elapsed, activeShader, player);
+		if (!IsChunkInRenderDistance(chunk, position)) continue;
+		if (!player.camera.IsBoxInView(chunk->GetPosition(), chunkSize)) continue;
+		if (chunk->HasOnlyInvisibleCubes()) continue;
+			
+		chunksToRender.push_back(chunk);
+		nRendered++;
 	}
-	std::cout << "nDiscarded: "<< nDiscarded << " Total: " << chunks.size() << "\n";
+	std::cout << "nRendered: "<< nRendered << " Total: " << chunks.size() << "\n";
+
+	CalculateVisibleBlocks(chunksToRender, player);
+
+	for (auto& chunk : chunksToRender)
+	{
+		chunk->Render(elapsed, activeShader, player);
+	}
 }
 
 void ChunkHandler::Update(float elapsed, Player& player)
@@ -40,11 +48,11 @@ void ChunkHandler::Update(float elapsed, Player& player)
 	glm::vec3 position = ToChunkPosition(player.GetPosition());
 
 	if (position != m_LastPlayerPosition) 
-		MoveChunks(position);
+		MoveChunks(position, player);
 
 	if (areCollisionsOn)
 		for (auto& chunk : chunks)
-			if (GetDistanceToChunk(chunk, player.GetPosition()) < 15.f)
+			if (GetDistanceToChunk(chunk, player.GetPosition()) < 17.f)
 				for (auto& block : chunk->blocks)
 					if (block->type != Block::Type::None && glm::distance(block->GetPosition(), player.GetPosition()) < 2.0f)
 						m_CollisionHandler.Handle(&player, block);
@@ -109,7 +117,7 @@ void ChunkHandler::CalculateChunkPositions(const glm::vec3& center, std::vector<
 				positions.push_back(startingCorner + glm::vec3(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE));
 }
 
-void ChunkHandler::MoveChunks(const glm::vec3& center)
+void ChunkHandler::MoveChunks(const glm::vec3& center, Player& player)
 {
 	std::vector<glm::vec3> positions;
 	CalculateChunkPositions(center, positions);
@@ -138,30 +146,22 @@ void ChunkHandler::MoveChunks(const glm::vec3& center)
 
 	std::atomic_int index = 0;
 
-	auto task = [&]()
+	auto task = [&](int id)
 	{
-		while (index < chunksToMove.size() - 1)
+		while (index++ < chunksToMove.size() - 1)
 		{
-			int i = index++;
+			int i = index - 1;
 			chunksToMove[i]->SetPosition(emptyPositions[i]);
 		}
   	};
 
-	// TODO: Use thread pool, this is too slow
+	std::vector<std::future<void>> tasks;
 
-	std::thread t1(task);
-	std::thread t2(task);
-	std::thread t3(task);
-	std::thread t4(task);
-	std::thread t5(task);
-	std::thread t6(task);
-
-	t1.join();
-	t2.join();
-	t3.join();
-	t4.join();
-	t5.join();
-	t6.join();
+	for (size_t i = 0; i < threadPool.size(); i++)
+		tasks.push_back(threadPool.push(task));
+	
+	for (size_t i = 0; i < tasks.size(); i++)
+		tasks[i].wait();
 }
 
 glm::vec3 ChunkHandler::ToChunkPosition(glm::vec3 position) const
@@ -171,6 +171,31 @@ glm::vec3 ChunkHandler::ToChunkPosition(glm::vec3 position) const
 	position.z = (int)position.z - (int)position.z % CHUNK_SIZE;
 
 	return position;
+}
+
+void ChunkHandler::CalculateVisibleBlocks(std::vector<Chunk*>& visibleChunks, Player& player)
+{
+	if (visibleChunks.size() == 0) return;
+
+	std::mutex mutex;
+	std::atomic_int index = 0;
+
+	auto task = [&](int id)
+	{
+		while (index++ < visibleChunks.size() - 1)
+		{
+			int i = index.load() - 1;
+			visibleChunks[i]->CalculateVisibleBlocks(player);
+		}
+	};
+
+	std::vector<std::future<void>> tasks;
+
+	for (size_t i = 0; i < threadPool.size(); i++)
+		tasks.push_back(threadPool.push(task));
+
+	for (size_t i = 0; i < tasks.size(); i++)
+		tasks[i].wait();
 }
 
 void ChunkHandler::GenerateChunks()

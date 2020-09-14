@@ -6,6 +6,7 @@
 GameEngineBase::GameEngineBase()
 {
 	m_Window = nullptr;
+	// threadPool.resize(std::thread::hardware_concurrency());
 }
 
 GameEngineBase::~GameEngineBase()

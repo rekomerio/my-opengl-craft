@@ -12,7 +12,7 @@ public:
 	virtual void ApplyModelToProgram(GLuint activeShader);
 	virtual void Rotate(float degrees, glm::vec3 axis);
 	virtual void SetPosition(glm::vec3 position);
-	inline glm::vec3 GetPosition() const { return m_Position; }
+  	inline glm::vec3 GetPosition() const { return m_Position; }
 	inline glm::vec3 GetRotation() const { return m_Rotation; }
 
 protected:

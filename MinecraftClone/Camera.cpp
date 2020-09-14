@@ -109,7 +109,7 @@ bool Camera::IsPointInView(const glm::vec3& point) const
 }
 
 // Kinda works, but there are situations where none of the corners are in view but the box still is
-bool Camera::IsBoxInView(const glm::vec3& corner, const glm::vec3& size)
+bool Camera::IsBoxInView(const glm::vec3& corner, const glm::vec3& size) const
 {
 	for (size_t x = 0; x < 2; x++)
 		for (size_t y = 0; y < 2; y++)	

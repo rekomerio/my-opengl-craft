@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include "Mesh.h"
+// #include "threading/ctpl_stl.h"
 
 class GameEngineBase
 {
@@ -28,9 +29,11 @@ public:
 	static GLuint CreateShader(GLuint shaderType, std::string source);
 	static GLuint CreateShaderProgram(GLuint vertexShader, GLuint fragmentShader);
 
+	// ctpl::thread_pool threadPool;
 protected:
 	GLFWwindow* m_Window;
 	std::vector<Mesh*> meshes;
 	std::vector<GLuint> textures;
+
 };
 

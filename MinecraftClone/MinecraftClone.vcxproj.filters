@@ -122,5 +122,8 @@
     <ClInclude Include="frustum\Plane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="threading\ctpl_stl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

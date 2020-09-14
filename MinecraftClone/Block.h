@@ -5,12 +5,12 @@
 class Block : public GameModel
 {
 public:
+	// None should always be the last option
 	enum Type {
 		Dirt,
 		Stone,
 		Sand,
-		None,
-		Cobblestone,
+		None
 	};
 
 	Block();
@@ -22,5 +22,6 @@ public:
 
 	Mesh* mesh;
 	Block::Type type;
+	bool isHidden;
 };
 

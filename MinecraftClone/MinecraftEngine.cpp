@@ -78,7 +78,7 @@ bool MinecraftEngine::OnCreate()
 
     chunkHandler.blockMesh = blockMesh;
 
-    chunkHandler.SetRenderDistance(4);
+    chunkHandler.SetRenderDistance(3);
 
     player = new Player();
     player->isStatic = false;
@@ -111,12 +111,12 @@ void MinecraftEngine::Render(float elapsed)
     chunkHandler.Render(elapsed, activeShader, *player);
 
     glUniform1i(glGetUniformLocation(activeShader, "useTexture"), 0);
-    //particleHandler.Render(elapsed, activeShader);
+    particleHandler.Render(elapsed, activeShader);
 
     char buffer[128];
     // sprintf_s(buffer, "%d", (int)(1.0f / elapsed));
     glm::vec3 pos = player->GetPosition();
-    sprintf_s(buffer, "X: %f Y:%f Z: %f", pos.x, pos.y, pos.z);
+    sprintf_s(buffer, "X: %f Y:%f Z: %f FPS: %d", pos.x, pos.y, pos.z, (int)(1.0f / elapsed));
     glfwSetWindowTitle(m_Window, buffer);
 }
 

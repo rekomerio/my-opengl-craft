@@ -4,6 +4,7 @@ Block::Block()
 {
     mesh = nullptr; // GameEngine will destroy mesh
     type = Block::Type::Dirt;
+    isHidden = false;
 }
 
 Block::Block(glm::vec3 position)
